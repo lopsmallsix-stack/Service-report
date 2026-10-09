@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#17324d"><title>Service Report</title>
+<style>
+:root{--navy:#17324d;--blue:#2463a6;--bg:#f3f6f9;--line:#d7e0e8;--muted:#637386}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);font:16px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#182532}
+header{background:var(--navy);color:white;padding:18px 16px;position:sticky;top:0;z-index:5}header h1{margin:0;font-size:20px}header p{margin:5px 0 0;font-size:12px;opacity:.85}
+main{max-width:850px;margin:auto;padding:12px}.card{background:white;border:1px solid var(--line);border-radius:14px;padding:14px;margin:12px 0;box-shadow:0 2px 8px #17324d0a}
+h2{font-size:17px;margin:0 0 12px;color:var(--navy)}label{display:block;font-size:13px;font-weight:650;margin:10px 0 5px}
+input,textarea,select,button{font:inherit}input[type=text],input[type=date],textarea,select{width:100%;border:1px solid #bdcbd8;border-radius:9px;padding:11px;background:white;color:#172532}
+textarea{min-height:66px;resize:vertical}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.step{border:1px solid var(--line);border-radius:12px;padding:12px;margin:12px 0;background:#fbfdff}.stephead{display:flex;align-items:center;justify-content:space-between;gap:8px}.stephead h3{margin:0;font-size:15px}.photos{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}.thumb{width:78px;height:78px;object-fit:cover;border-radius:8px;border:1px solid var(--line)}.photoitem{position:relative}.photoitem button{position:absolute;right:-6px;top:-6px;border:0;border-radius:50%;background:#b42318;color:white;width:24px;height:24px;padding:0}
+button,.filebtn{border:0;border-radius:10px;padding:11px 13px;background:var(--blue);color:white;font-weight:650;cursor:pointer}.secondary{background:#e8eef4;color:#17324d}.danger{background:#fff0ef;color:#a32118}.actions{display:grid;grid-template-columns:1fr 1fr;gap:9px}.actions button{width:100%}.hint{font-size:12px;color:var(--muted);line-height:1.5}.pill{display:inline-block;background:#e8f2ff;color:#174f89;border-radius:20px;padding:4px 8px;font-size:11px}.presetrow{display:grid;grid-template-columns:1fr auto;gap:7px;margin:6px 0}.small{padding:8px 10px;font-size:13px}.hidden{display:none!important}
+@media(max-width:520px){.grid{grid-template-columns:1fr}.actions{grid-template-columns:1fr}main{padding:8px}.card{padding:12px}}
+</style>
+</head>
+<body>
+<header><h1>Service Report</h1><p>สร้างรายงานซ่อม PDF • A4 แนวตั้ง • เลือกรูปจาก iPhone</p></header>
+<main>
+<div class="card">
+<h2>ข้อมูลลูกค้าและเครื่อง</h2>
+<div class="grid"><div><label>Customer Name</label><input id="customer" type="text" placeholder="ชื่อลูกค้า"></div><div><label>Machine Name</label><input id="machine" type="text" placeholder="ชื่อเครื่อง / รุ่น"></div></div>
+<label>Date</label><input id="date" type="date">
+<label>Report / Case No. (ถ้ามี)</label><input id="caseNo" type="text" placeholder="หมายเลขงาน">
+</div>
+<div class="card">
+<h2>Repair Steps <span class="pill" id="stepCount">1 ขั้นตอน</span></h2>
+<div id="steps"></div><button id="addStep" class="secondary" type="button">＋ เพิ่มขั้นตอนซ่อม</button>
+<p class="hint">แต่ละขั้นตอนเพิ่มรูปได้หลายรูป รูปจะเรียงแนวตั้งในรายงาน PDF</p>
+</div>
+<div class="card">
+<h2>รายการสำเร็จรูป (Presets)</h2>
+<p class="hint">เพิ่ม/แก้ไข/ลบคำที่ใช้บ่อยได้ รายการจะบันทึกไว้ใน Safari เครื่องนี้</p>
+<label>เลือกช่องที่ต้องการจัดการ</label><select id="presetField"><option>Target</option><option>Action</option><option>Result</option><option>Next Action</option></select>
+<div id="presetList"></div>
+<div class="presetrow"><input id="newPreset" type="text" placeholder="พิมพ์รายการใหม่"><button id="addPreset" class="small">เพิ่ม</button></div>
+</div>
+<div class="card">
+<h2>สร้างรายงาน</h2>
+<label>ขนาดภาพใน PDF</label><select id="quality"><option value="0.55">ไฟล์เล็ก (แนะนำ)</option><option value="0.68">สมดุล</option><option value="0.8">ภาพชัดขึ้น แต่ไฟล์ใหญ่ขึ้น</option></select>
+<label><input id="includePhotos" type="checkbox" checked> ใส่รูปภาพใน PDF</label>
+<p class="hint">เป้าหมายไฟล์ไม่เกิน 1.5 MB แต่รับประกันไม่ได้ทุกกรณี เพราะขึ้นกับจำนวนและขนาดรูป หากเกินจะมีข้อความแจ้งเตือน</p>
+<div class="actions"><button id="makePdf">สร้าง PDF</button><button id="saveDraft" class="secondary">บันทึกข้อมูลไว้ในเครื่อง</button></div>
+<p id="status" class="hint" aria-live="polite"></p>
+</div>
+</main>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+const $=id=>document.getElementById(id);
+const fields=["Target","Action","Result","Next Action"];
+const defaults={
+"Target":["Investigate reported issue","Check machine operation","Inspect alarm / error code"],
+"Action":["Power cycle the machine","Inspect wiring and connectors","Clean and reseat connector","Replace faulty component","Run machine diagnostic"],
+"Result":["Machine returned to normal operation","Issue still occurs","Test completed successfully","Further monitoring required"],
+"Next Action":["No further action required","Monitor machine operation","Prepare quotation for replacement part","Follow up with customer","Return for further troubleshooting"]
+};
+let presets=JSON.parse(localStorage.getItem("sr_presets")||"null")||defaults;
+let steps=[];
+function newStep(){return {target:"",action:"",result:"",next:"",notes:"",photos:[]}}
+function esc(s){return String(s||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function persistPresets(){localStorage.setItem("sr_presets",JSON.stringify(presets))}
+function renderPresets(){
+ let f=$("presetField").value, list=$( "presetList");list.innerHTML="";
+ (presets[f]||[]).forEach((v,i)=>{let row=document.createElement("div");row.className="presetrow";row.innerHTML=`<input type="text" value="${esc(v)}" aria-label="รายการสำเร็จรูป"><div style="display:flex;gap:5px"><button class="small" type="button">แก้ไข</button><button class="small danger" type="button">ลบ</button></div>`;
+ row.children[1].children[0].onclick=()=>{let nv=row.querySelector("input").value.trim();if(nv){presets[f][i]=nv;persistPresets();renderPresets();renderSteps()}}
+ row.children[1].children[1].onclick=()=>{presets[f].splice(i,1);persistPresets();renderPresets();renderSteps()};list.appendChild(row)})
+}
+function renderSteps(){
+ $("steps").innerHTML="";$("stepCount").textContent=steps.length+" ขั้นตอน";
+ steps.forEach((s,i)=>{
+ let d=document.createElement("div");d.className="step";
+ d.innerHTML=`<div class="stephead"><h3>ขั้นตอนที่ ${i+1}</h3><button type="button" class="small danger remove">ลบขั้นตอน</button></div>
+ ${fieldMarkup("Target","target",s.target,i)}
+ ${fieldMarkup("Action","action",s.action,i)}
+ ${fieldMarkup("Result","result",s.result,i)}
+ ${fieldMarkup("Next Action","next",s.next,i)}
+ <label>รายละเอียดเพิ่มเติม (ถ้ามี)</label><textarea data-key="notes" placeholder="รายละเอียดเพิ่มเติม">${esc(s.notes)}</textarea>
+ <label>รูปภาพของขั้นตอนนี้ (เลือกได้หลายรูป)</label><input type="file" accept="image/*" multiple class="photoInput">
+ <div class="photos"></div><p class="hint">${s.photos.length} รูป</p>`;
+ d.querySelector(".remove").onclick=()=>{steps.splice(i,1);renderSteps()};
+ d.querySelectorAll("[data-key]").forEach(el=>el.oninput=()=>s[el.dataset.key]=el.value);
+ d.querySelectorAll("select[data-field]").forEach(el=>el.onchange=()=>{s[el.dataset.field]=el.value;renderSteps()});
+ d.querySelector(".photoInput").onchange=async ev=>{for(const file of ev.target.files){try{s.photos.push(await compressImage(file,1400,.82))}catch(e){}}renderSteps()};
+ const thumbs=d.querySelector(".photos");s.photos.forEach((src,j)=>{let w=document.createElement("div");w.className="photoitem";w.innerHTML=`<img class="thumb" src="${src}"><button type="button" aria-label="ลบรูป">×</button>`;w.querySelector("button").onclick=()=>{s.photos.splice(j,1);renderSteps()};thumbs.appendChild(w)});
+ $("steps").appendChild(d)
+ })
+}
+function fieldMarkup(label,key,value,i){
+ let f=key==="next"?"Next Action":label;
+ return `<label>${label}</label><select data-field="${key}"><option value="">— เลือกหรือพิมพ์เองด้านล่าง —</option>${(presets[f]||[]).map(v=>`<option value="${esc(v)}" ${v===value?"selected":""}>${esc(v)}</option>`).join("")}<option value="__custom">พิมพ์เอง…</option></select><input data-custom="${key}" type="text" value="${esc(value)}" placeholder="พิมพ์ ${label} เอง" style="margin-top:6px">`
+}
+// Add direct custom text inputs and keep selects synchronized.
+function bindCustomInputs(){
+ $("steps").querySelectorAll("[data-custom]").forEach(el=>{let s=steps[Array.from($("steps").querySelectorAll(".step")).indexOf(el.closest(".step"))];el.oninput=()=>s[el.dataset.custom]=el.value});
+}
+const originalRenderSteps=renderSteps;
+renderSteps=function(){originalRenderSteps();bindCustomInputs()}
+async function compressImage(file,maxDim=1400,quality=.82){
+ return new Promise((resolve,reject)=>{const reader=new FileReader();reader.onerror=reject;reader.onload=()=>{const img=new Image();img.onerror=reject;img.onload=()=>{let scale=Math.min(1,maxDim/Math.max(img.width,img.height));let c=document.createElement("canvas");c.width=Math.round(img.width*scale);c.height=Math.round(img.height*scale);c.getContext("2d").drawImage(img,0,0,c.width,c.height);resolve(c.toDataURL("image/jpeg",quality))};img.src=reader.result};reader.readAsDataURL(file)})
+}
+$("addStep").onclick=()=>{steps.push(newStep());renderSteps()};
+$("presetField").onchange=renderPresets;
+$("addPreset").onclick=()=>{let f=$("presetField").value,v=$("newPreset").value.trim();if(!v)return;(presets[f] ||= []).push(v);persistPresets();$("newPreset").value="";renderPresets();renderSteps()};
+$("saveDraft").onclick=()=>{try{const draft={customer:$("customer").value,machine:$("machine").value,date:$("date").value,caseNo:$("caseNo").value,steps};localStorage.setItem("sr_draft",JSON.stringify(draft));$("status").textContent="บันทึกข้อมูลไว้ใน Safari เครื่องนี้แล้ว"}catch(e){$("status").textContent="บันทึกไม่สำเร็จ อาจมีรูปมากเกินไป กรุณาสร้าง PDF หรือเลือกรูปให้น้อยลง"}};
+function loadDraft(){let d=JSON.parse(localStorage.getItem("sr_draft")||"null");if(d){$("customer").value=d.customer||"";$("machine").value=d.machine||"";$("date").value=d.date||"";$("caseNo").value=d.caseNo||"";steps=Array.isArray(d.steps)?d.steps:[]}}
+function textWrap(doc,text,x,y,w,lineH=5){const lines=doc.splitTextToSize(String(text||"—"),w);doc.text(lines,x,y);return y+lines.length*lineH}
+async function makePDF(){
+ const status=$("status");status.textContent="กำลังสร้าง PDF…";
+ try{
+ if(!window.jspdf){throw new Error("โหลดตัวสร้าง PDF ไม่สำเร็จ กรุณาตรวจอินเทอร์เน็ตแล้วลองใหม่")}
+ const {jsPDF}=window.jspdf,doc=new jsPDF({orientation:"portrait",unit:"mm",format:"a4"});
+ const W=210,H=297,margin=14,contentW=W-margin*2;let y=16;
+ function ensure(h){if(y+h>H-13){doc.addPage();y=16}}
+ function line(){doc.setDrawColor(190,202,214);doc.line(margin,y,W-margin,y);y+=5}
+ doc.setFont("helvetica","bold");doc.setFontSize(17);doc.text("SERVICE REPORT",margin,y);y+=9;
+ doc.setFont("helvetica","normal");doc.setFontSize(10);
+ y=textWrap(doc,"Customer Name: "+($("customer").value||"—"),margin,y,contentW,5)+2;
+ y=textWrap(doc,"Machine Name: "+($("machine").value||"—"),margin,y,contentW,5)+2;
+ y=textWrap(doc,"Date: "+($("date").value||"—")+"     Case No.: "+($("caseNo").value||"—"),margin,y,contentW,5)+3;line();
+ const include=$("includePhotos").checked,quality=Number($("quality").value);
+ for(let i=0;i<steps.length;i++){
+  let s=steps[i];ensure(28);doc.setFont("helvetica","bold");doc.setFontSize(12);doc.text("Repair Step "+(i+1),margin,y);y+=7;
+  doc.setFont("helvetica","normal");doc.setFontSize(10);
+  for(const [label,key] of [["Target","target"],["Action","action"],["Result","result"],["Next Action","next"]]){
+   ensure(10);doc.setFont("helvetica","bold");doc.text(label+":",margin,y);
+   doc.setFont("helvetica","normal");const val=s[key]||"—";let lines=doc.splitTextToSize(val,contentW-29);doc.text(lines,margin+29,y);y+=Math.max(5,lines.length*5)+2;
+  }
+  if(s.notes){ensure(10);doc.setFont("helvetica","bold");doc.text("Notes:",margin,y);doc.setFont("helvetica","normal");y=textWrap(doc,s.notes,margin+29,y,contentW-29,5)+2}
+  if(include)for(const data of s.photos||[]){
+   try{
+    let img=new Image();img.src=data;await new Promise((res,rej)=>{img.onload=res;img.onerror=rej});
+    let maxW=contentW,maxH=88,ratio=Math.min(maxW/img.width,maxH/img.height);let iw=img.width*ratio,ih=img.height*ratio;
+    ensure(ih+7);doc.addImage(data,"JPEG",margin,y,iw,ih,undefined,"FAST");y+=ih+5;
+   }catch(e){/* skip corrupt photo */}
+  }
+  y+=3;line();
+ }
+ const pages=doc.getNumberOfPages();for(let p=1;p<=pages;p++){doc.setPage(p);doc.setFontSize(8);doc.setTextColor(90);doc.text("Page "+p+" / "+pages,W-margin,H-7,{align:"right"});doc.setTextColor(0)}
+ let name=($("customer").value||"Customer").replace(/[\\/:*?"<>|]/g,"_").trim().replace(/\s+/g,"_");
+ const blob=doc.output("blob");const sizeMB=blob.size/1024/1024;
+ const url=URL.createObjectURL(blob);let a=document.createElement("a");a.href=url;a.download=`Service_Report_${name}_${$("date").value||"date"}.pdf`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),60000);
+ status.textContent=`สร้าง PDF แล้ว ขนาดประมาณ ${sizeMB.toFixed(2)} MB`+(sizeMB>1.5?" — เกิน 1.5 MB: ลองลดคุณภาพรูปหรือลดจำนวนรูป":" — บันทึกไฟล์ลงอุปกรณ์แล้ว");
+ }catch(e){status.textContent="สร้าง PDF ไม่สำเร็จ: "+e.message}
+}
+$("makePdf").onclick=makePDF;
+$("date").value=new Date().toISOString().slice(0,10);
+loadDraft();if(!steps.length)steps=[newStep()];renderPresets();renderSteps();
+</script>
+</body></html>
