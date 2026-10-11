@@ -3,44 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Service Report Web App</title>
+    <title>Service Report Web App (Mobile Optimized)</title>
     <style>
-        /* --- CSS จัดหน้ารายงานสำหรับพิมพ์ A4 แนวนอน --- */
+        /* --- CSS พื้นฐานและระบบ Layout --- */
         body {
             font-family: 'Sarabun', sans-serif, Arial;
             margin: 0;
-            padding: 20px;
+            padding: 10px;
             background-color: #f4f6f9;
         }
         .container {
             max-width: 1100px;
             margin: 0 auto;
             background: #fff;
-            padding: 30px;
+            padding: 15px;
             border-radius: 8px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
         h1, h2 {
             text-align: center;
             color: #333;
+            margin-bottom: 10px;
         }
         .action-bar {
-            display: flex;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
             gap: 10px;
-            justify-content: center;
             margin-bottom: 20px;
             background: #eef2f7;
-            padding: 15px;
+            padding: 10px;
             border-radius: 6px;
         }
+        .action-bar button:last-child {
+            grid-column: span 2; /* ปุ่มพิมพ์เต็มความกว้างในมือถือ */
+        }
         button {
-            padding: 10px 20px;
-            font-size: 16px;
+            padding: 12px 15px;
+            font-size: 15px;
             cursor: pointer;
             border: none;
-            border-radius: 4px;
+            border-radius: 6px;
             font-weight: bold;
             transition: 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
         }
         .btn-success { background-color: #28a745; color: white; }
         .btn-primary { background-color: #007bff; color: white; }
@@ -50,9 +58,16 @@
         
         .meta-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin-bottom: 30px;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        @media (min-width: 768px) {
+            .meta-grid { grid-template-columns: repeat(2, 1fr); }
+            .action-bar { grid-template-columns: repeat(3, 1fr); }
+            .action-bar button:last-child { grid-column: auto; }
+            body { padding: 20px; }
+            .container { padding: 30px; }
         }
         .form-group {
             display: flex;
@@ -62,71 +77,112 @@
             font-weight: bold;
             margin-bottom: 5px;
             color: #555;
+            font-size: 14px;
         }
         .form-group input {
-            padding: 8px;
+            padding: 10px;
             border: 1px solid #ccc;
-            border-radius: 4px;
+            border-radius: 6px;
             font-size: 15px;
         }
 
-        /* โครงสร้างตารางแนวราบตามโจทย์ (Target -> Action -> รูป -> Result -> Next Action) */
+        /* --- สไตล์แสดงผลส่วน Repair Details โหมดหน้าจอปกติ --- */
+        .step-table-wrapper {
+            overflow-x: auto;
+            margin-top: 15px;
+        }
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
         }
         th, td {
             border: 1px solid #aaa;
-            padding: 8px;
+            padding: 10px;
             text-align: left;
             vertical-align: top;
         }
-        th {
-            background-color: #f2f2f2;
-        }
+        th { background-color: #f2f2f2; }
+        
         .step-row input, .step-row textarea {
             width: 95%;
-            padding: 6px;
+            padding: 8px;
             border: 1px solid #ddd;
             border-radius: 4px;
-            resize: vertical;
             font-family: inherit;
+            font-size: 14px;
         }
         .preview-img {
             max-width: 120px;
             max-height: 120px;
             display: block;
-            margin-top: 5px;
+            margin-top: 8px;
             border: 1px dashed #ccc;
             object-fit: contain;
         }
 
-        /* --- CSS พิเศษสำหรับการพิมพ์ (Print Media) --- */
+        /* 📱 ปรับหน้าตาตารางให้เป็น "การ์ด" เพื่อให้ใช้งานบนมือถือได้ง่าย ไม่ล้นจอ */
+        @media (max-width: 767px) {
+            table, thead, tbody, th, td, tr { 
+                display: block; 
+            }
+            thead { display: none; } /* ซ่อนหัวตารางเดิม */
+            
+            .step-row {
+                background: #fff;
+                border: 2px solid #007bff;
+                border-radius: 8px;
+                margin-bottom: 20px;
+                padding: 12px;
+                position: relative;
+            }
+            .step-row td {
+                border: none;
+                padding: 6px 0;
+                display: flex;
+                flex-direction: column;
+            }
+            /* สร้างหัวข้อจำลองกำกับแต่ละช่องในมือถือ */
+            .step-row td::before {
+                font-weight: bold;
+                color: #007bff;
+                margin-bottom: 4px;
+                font-size: 13px;
+            }
+            .step-row td:nth-of-type(1)::before { content: "ขั้นตอนที่:"; }
+            .step-row td:nth-of-type(2)::before { content: "Target (เป้าหมาย):"; }
+            .step-row td:nth-of-type(3)::before { content: "Action (การแก้ไข):"; }
+            .step-row td:nth-of-type(4)::before { content: "รูปประกอบ:"; }
+            .step-row td:nth-of-type(5)::before { content: "Result (ผลลัพธ์):"; }
+            .step-row td:nth-of-type(6)::before { content: "Next Action (แผนต่อไป):"; }
+            
+            .step-row input, .step-row textarea {
+                width: 100% !important;
+                box-sizing: border-box;
+            }
+            .step-row td:last-child {
+                align-items: flex-end;
+                border-top: 1px dashed #ddd;
+                margin-top: 5px;
+            }
+        }
+
+        /* --- 🖨️ CSS พิเศษสำหรับการพิมพ์ออกกระดาษ (Print Media) --- */
         @media print {
-            body {
-                background-color: #fff;
-                padding: 0;
+            /* บังคับให้คืนร่างกลับเป็นตารางแนวนอนตอนสั่งพิมพ์เสมอ ไม่ว่าจะพิมพ์จากอุปกรณ์ใด */
+            table { display: table !important; width: 100% !important; border-collapse: collapse !important; }
+            thead { display: table-header-group !important; }
+            tbody { display: table-row-group !important; }
+            .step-row { display: table-row !important; border: 1px solid #aaa !important; background: transparent !important; padding: 0 !important; }
+            .step-row td { display: table-cell !important; border: 1px solid #aaa !important; padding: 8px !important; flex-direction: row !important; }
+            .step-row td::before { display: none !important; }
+            
+            body { background-color: #fff; padding: 0; }
+            .action-bar, .btn-danger, .btn-primary, input[type="file"], .step-row td:last-child, th:last-child {
+                display: none !important;
             }
-            .action-bar, .btn-danger, .btn-info, input[type="file"], .step-row td:last-child, th:last-child {
-                display: none !important; /* ซ่อนปุ่มควบคุมและปุ่มลบตอนพิมพ์ */
-            }
-            .container {
-                box-shadow: none;
-                padding: 0;
-                max-width: 100%;
-            }
-            input, textarea {
-                border: none !important;
-                background: transparent !important;
-                outline: none !important;
-                resize: none !important;
-            }
-            /* บังคับหน้ากระดาษ A4 แนวนอน */
-            @page {
-                size: A4 landscape;
-                margin: 15mm;
-            }
+            .container { box-shadow: none; padding: 0; max-width: 100%; }
+            input, textarea { border: none !important; background: transparent !important; outline: none !important; resize: none !important; }
+            @page { size: A4 landscape; margin: 12mm; }
         }
     </style>
 </head>
@@ -136,14 +192,13 @@
     <h1>SERVICE REPORT</h1>
     <h2>Service / Maintenance Record</h2>
 
-    <!-- บาร์ปุ่มควบคุมการทำงาน -->
+    <!-- ปุ่มกดขนาดใหญ่จิ้มง่ายในมือถือ -->
     <div class="action-bar">
         <button type="button" class="btn-success" onclick="saveDraft()">💾 บันทึกฉบับร่าง</button>
         <button type="button" class="btn-info" onclick="loadDraft()">📂 โหลดฉบับร่าง</button>
-        <button type="button" class="btn-primary" onclick="triggerPrint()">🖨️ พิมพ์ / บันทึก PDF แนวนอน</button>
+        <button type="button" class="btn-primary" onclick="triggerPrint()">🖨️ พิมพ์ / บันทึก PDF</button>
     </div>
 
-    <!-- ส่วนข้อมูลลูกค้าและเครื่องจักร -->
     <div class="meta-grid">
         <div class="form-group">
             <label>Customer Name</label>
@@ -164,60 +219,39 @@
     </div>
 
     <h2>Repair Details</h2>
-    <button type="button" class="btn-primary" onclick="addStepRow()">➕ เพิ่มขั้นตอน</button>
+    <button type="button" class="btn-primary" style="margin-bottom: 10px; width: 100%; max-width: 200px;" onclick="addStepRow()">➕ เพิ่มขั้นตอน</button>
     
-    <!-- ตารางบันทึกขั้นตอนงาน -->
-    <table>
-        <thead>
-            <tr>
-                <th style="width: 5%;">Step</th>
-                <th style="width: 20%;">Target</th>
-                <th style="width: 25%;">Action</th>
-                <th style="width: 15%;">รูปประกอบ</th>
-                <th style="width: 20%;">Result</th>
-                <th style="width: 10%;">Next Action</th>
-                <th style="width: 5%;">จัดการ</th>
-            </tr>
-        </thead>
-        <tbody id="stepTableBody">
-            <!-- แถวขั้นตอนจะถูกเพิ่มที่นี่ผ่าน JavaScript -->
-        </tbody>
-    </table>
+    <div class="step-table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 5%;">Step</th>
+                    <th style="width: 20%;">Target</th>
+                    <th style="width: 25%;">Action</th>
+                    <th style="width: 15%;">รูปประกอบ</th>
+                    <th style="width: 20%;">Result</th>
+                    <th style="width: 10%;">Next Action</th>
+                    <th style="width: 5%;">จัดการ</th>
+                </tr>
+            </thead>
+            <tbody id="stepTableBody">
+                <!-- แถวจะถูกเพิ่มที่นี่ -->
+            </tbody>
+        </table>
+    </div>
 </div>
 
-<!-- ========================================== -->
-<!-- ข้อที่ 3: คลังช้อยส์คำตอบที่ใช้บ่อย (Data List Suggestions) -->
-<!-- ========================================== -->
+<!-- คลังช้อยส์คำตอบดรอปดาวน์ที่ใช้บ่อย -->
 <datalist id="target-suggestions">
     <option value="เครื่องจักรหลัก (Main Machine)">
     <option value="ระบบควบคุม/ไฟฟ้า (Electrical System)">
     <option value="ปั๊มไฮดรอลิก/ระบบลม (Pump & Pneumatic)">
     <option value="โครงสร้างภายนอก (Structure & Body)">
-    <option value="เซนเซอร์/ระบบวัดระยะ (Sensor & Calibration)">
 </datalist>
 
-<datalist id="action-suggestions">
-    <option value="ตรวจเช็กสภาพภายนอกและทำความสะอาดสิ่งสกปรก">
-    <option value="ดำเนินการเปลี่ยนอะไหล่และชิ้นส่วนที่เสื่อมสภาพ">
-    <option value="ปรับแต่งตั้งค่าการทำงาน (Calibration) ให้ตรงตามเกณฑ์">
-    <option value="ขันแน่นจุดยึดและทาจารบีหล่อลื่นระบบส่งกำลัง">
-    <option value="แก้ไขวงจรไฟฟ้าที่หลวมและทดสอบการจ่ายกระแสไฟ">
-</datalist>
-
-<datalist id="result-suggestions">
-    <option value="เครื่องจักรกลับมาทำงานได้ตามปกติ 100%">
-    <option value="ผ่านการทดสอบเบื้องต้น ควรเฝ้าระวังอาการเพิ่มเติม">
-    <option value="ยังไม่สมบูรณ์เนื่องจากต้องรออะไหล่ทดแทนเพิ่มเติม">
-    <option value="แก้ไขชั่วคราวเพื่อให้ระบบเดินเครื่องต่อได้ก่อน">
-</datalist>
-
-<!-- ========================================== -->
-<!-- ระบบจัดการหลังบ้าน (JavaScript) -->
-<!-- ========================================== -->
 <script>
     let stepCount = 0;
 
-    // 1. ฟังก์ชันเพิ่มแถวขั้นตอนใหม่
     function addStepRow(savedData = null) {
         stepCount++;
         const tbody = document.getElementById('stepTableBody');
@@ -225,52 +259,10 @@
         row.className = 'step-row';
         row.id = `step_row_${stepCount}`;
 
-        // โครงสร้างคอลัมน์ดึงจากคำตอบที่ใช้บ่อยด้วยดรอปดาวน์อัตโนมัติ (list="...")
         row.innerHTML = `
             <td style="text-align:center; font-weight:bold;">${stepCount}</td>
-            <td><input type="text" class="t-input" list="target-suggestions" value="${savedData ? savedData.target : ''}" placeholder="ระบุเป้าหมาย..."></td>
-            <td><textarea class="a-input" list="action-suggestions" rows="3" placeholder="ระบุการแก้ไข...">${savedData ? savedData.action : ''}</textarea></td>
+            <td><input type="text" class="t-input" list="target-suggestions" value="${savedData ? savedData.target : ''}" placeholder="เลือกหรือพิมพ์เป้าหมาย..."></td>
+            <td><textarea class="a-input" rows="3" placeholder="ระบุการแก้ไข...">${savedData ? savedData.action : ''}</textarea></td>
             <td>
-                <input type="file" accept="image/*" onchange="handleImage(this, ${stepCount})">
+                <input type="file" accept="image/*" onchange="handleImage(this, ${stepCount})" style="width:100%;">
                 <img id="prev_${stepCount}" class="preview-img" src="${savedData ? savedData.img : ''}" style="${savedData && savedData.img ? 'display:block;' : 'display:none;'}">
-            </td>
-            <td><textarea class="r-input" rows="3" placeholder="ระบุผลลัพธ์...">${savedData ? savedData.result : ''}</textarea></td>
-            <td><input type="text" class="n-input" value="${savedData ? savedData.next : ''}" placeholder="แผนต่อไป..."></td>
-            <td><button type="button" class="btn-danger" onclick="removeStepRow(${stepCount})">ลบ</button></td>
-        `;
-        
-        tbody.appendChild(row);
-        // ผูกความสามารถคำตอบใช้บ่อยให้ Textarea (Action/Result)
-        bindDatalistToTextarea();
-    }
-
-    // ฟังก์ชันลบแถว
-    function removeStepRow(id) {
-        const row = document.getElementById(`step_row_${id}`);
-        if(row) row.remove();
-        reCalculateStepNumbers();
-    }
-
-    // จัดเลขลำดับขั้นตอนใหม่หลังจากมีการลบ
-    function reCalculateStepNumbers() {
-        const rows = document.querySelectorAll('#stepTableBody tr');
-        stepCount = 0;
-        rows.forEach((row) => {
-            stepCount++;
-            row.cells[0].innerText = stepCount;
-        });
-    }
-
-    // ==========================================
-    // ข้อที่ 1 & 2: ระบบบีบอัดรูปภาพอัจฉริยะ (กัน LocalStorage เต็ม)
-    // ==========================================
-    function compressImage(file, maxWidth = 600, quality = 0.6) {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = function (event) {
-                const img = new Image();
-                img.src = event.target.result;
-                img.onload = function () {
-                    const canvas = document.createElement('canvas');
-                    let width = img.width;
