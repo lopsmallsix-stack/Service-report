@@ -1,816 +1,825 @@
+
 <!DOCTYPE html>
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#17365d">
 <title>Service Report</title>
 
 <style>
-* {
-    box-sizing: border-box;
+:root {
+  --navy:#17365d;
+  --blue:#245a91;
+  --bg:#f2f5f9;
+  --line:#d6dee8;
+  --text:#182230;
 }
-
+* { box-sizing:border-box; }
 body {
-    margin: 0;
-    padding: 15px;
-    background: #f1f4f7;
-    color: #243447;
-    font-family: Arial, Tahoma, sans-serif;
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:Arial,"Noto Sans Thai",sans-serif;
+  font-size:15px;
 }
-
-.container {
-    max-width: 1400px;
-    margin: auto;
+header {
+  background:var(--navy);
+  color:white;
+  padding:18px 15px;
+  position:sticky;
+  top:0;
+  z-index:10;
+  box-shadow:0 2px 8px #0002;
 }
-
-.card {
-    background: white;
-    padding: 16px;
-    margin-bottom: 14px;
-    border: 1px solid #d8e0e8;
-    border-radius: 8px;
+header h1 { margin:0 0 5px; font-size:21px; }
+header p { margin:0; font-size:12px; opacity:.85; }
+main {
+  max-width:1000px;
+  margin:auto;
+  padding:12px;
 }
-
-h1 {
-    margin: 0;
-    font-size: 25px;
-    color: #183650;
+.panel {
+  background:white;
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:14px;
+  margin-bottom:13px;
 }
-
-h2 {
-    font-size: 17px;
-    color: #183650;
-}
-
+h2 { font-size:17px; margin:0 0 12px; color:var(--navy); }
+h3 { font-size:15px; margin:0 0 10px; }
 label {
-    display: block;
-    font-size: 12px;
-    font-weight: bold;
-    margin-bottom: 5px;
+  display:block;
+  font-size:13px;
+  font-weight:bold;
+  margin-bottom:5px;
 }
-
-input,
-textarea,
-select {
-    width: 100%;
-    padding: 8px;
-    border: 1px solid #cbd5df;
-    border-radius: 5px;
-    font-family: inherit;
-    font-size: 13px;
+input,textarea,select,button {
+  font:inherit;
 }
-
-textarea {
-    min-height: 65px;
-    resize: vertical;
+input[type=text],input[type=date],input[type=email],
+textarea,select {
+  width:100%;
+  min-height:44px;
+  padding:10px;
+  border:1px solid #cbd5e1;
+  border-radius:8px;
+  background:#fff;
+  color:var(--text);
 }
-
+textarea { resize:vertical; min-height:75px; }
+.field { margin-bottom:12px; min-width:0; }
+.grid {
+  display:grid;
+  grid-template-columns:1fr;
+  gap:0 12px;
+}
 button {
-    padding: 9px 13px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 13px;
-    font-weight: bold;
+  border:0;
+  border-radius:9px;
+  min-height:43px;
+  padding:10px 14px;
+  cursor:pointer;
+  font-weight:bold;
 }
-
-.primary {
-    background: #183650;
-    color: white;
+button:active { opacity:.75; }
+.primary { background:var(--navy); color:white; }
+.secondary { background:#e6edf5; color:var(--navy); }
+.danger { background:#fee2e2; color:#991b1b; }
+.success { background:#dcfce7; color:#166534; }
+.button-row {
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
 }
-
-.secondary {
-    background: #e8edf2;
-    color: #243447;
-}
-
-.danger {
-    background: #fde8e8;
-    color: #a32020;
-}
-
-.buttons {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 15px;
-}
-
-.header-fields {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 12px;
-    margin-top: 18px;
-}
-
+.button-row button { flex:1 1 130px; }
 .step {
-    border: 1px solid #bfcbd6;
-    margin-bottom: 12px;
-    background: white;
-    break-inside: avoid;
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:12px;
+  margin-bottom:12px;
+  background:#fff;
+  break-inside:avoid;
 }
-
-.step-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 8px 10px;
-    background: #eaf1f7;
-    font-weight: bold;
+.step-head {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:8px;
+  margin-bottom:12px;
 }
-
-.step-body {
-    padding: 10px;
+.step-number {
+  font-weight:bold;
+  color:var(--navy);
+  font-size:16px;
 }
-
-.step-fields {
-    display: grid;
-    grid-template-columns: 1fr 1.3fr 125px 1fr 1fr;
-    gap: 10px;
-    align-items: start;
+.photo-grid {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:8px;
+  margin-top:8px;
 }
-
-.photo {
-    width: 54px;
-    height: 42px;
-    object-fit: cover;
-    border: 1px solid #cbd5df;
-    border-radius: 3px;
-}
-
-.photo-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 5px;
-    margin-top: 6px;
-}
-
 .photo-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+  min-width:0;
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:5px;
 }
-
-.remove-photo {
-    padding: 3px 5px;
-    margin-top: 3px;
-    font-size: 10px;
+.photo-item img {
+  display:block;
+  width:100%;
+  height:115px;
+  object-fit:contain;
+  background:#f1f5f9;
 }
-
-.preset {
-    margin-top: 5px;
-    font-size: 11px;
-    padding: 5px;
+.photo-item button {
+  width:100%;
+  margin-top:5px;
+  min-height:34px;
 }
-
-.small {
-    font-size: 11px;
-    color: #607080;
-    margin-top: 5px;
+.photo-input { display:none; }
+.photo-label {
+  display:block;
+  text-align:center;
+  background:#e6edf5;
+  color:var(--navy);
+  padding:12px 8px;
+  border-radius:8px;
+  font-weight:bold;
+  cursor:pointer;
 }
-
-@media (max-width: 850px) {
-    .header-fields {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .step-fields {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .photo-area {
-        grid-column: span 2;
-    }
+.small-note { font-size:12px; color:#64748b; margin-top:6px; }
+.preset-row {
+  display:flex;
+  gap:6px;
+  margin-top:6px;
 }
-
-@page {
-    size: A4 landscape;
-    margin: 8mm;
+.preset-row select { flex:1; min-width:0; }
+.preset-row button { flex:0 0 auto; }
+hr { border:0; border-top:1px solid var(--line); margin:15px 0; }
+#status { font-size:13px; margin:8px 0; color:#166534; }
+#pdfArea { background:white; }
+.report-title { text-align:center; font-size:20px; font-weight:bold; }
+.report-subtitle { text-align:center; font-size:12px; margin:4px 0 14px; }
+.no-print {}
+@media(min-width:650px) {
+  main { padding:20px; }
+  .grid { grid-template-columns:1fr 1fr; }
+  .photo-grid { grid-template-columns:repeat(3,minmax(0,1fr)); }
 }
-
 @media print {
-    body {
-        background: white;
-        padding: 0;
-        font-size: 9pt;
-    }
-
-    .container {
-        max-width: none;
-    }
-
-    .card {
-        padding: 0;
-        margin-bottom: 4mm;
-        border: none;
-        border-radius: 0;
-    }
-
-    .no-print,
-    .buttons,
-    .preset,
-    .remove-photo,
-    .small {
-        display: none !important;
-    }
-
-    h1 {
-        font-size: 17pt;
-    }
-
-    h2 {
-        font-size: 12pt;
-        margin-bottom: 5px;
-    }
-
-    .header-fields {
-        gap: 3mm;
-        margin-top: 3mm;
-    }
-
-    label {
-        font-size: 7pt;
-        margin-bottom: 1mm;
-    }
-
-    input,
-    textarea {
-        border: none;
-        border-radius: 0;
-        padding: 1mm 0;
-        background: transparent;
-        color: black;
-        font-size: 8pt;
-    }
-
-    textarea {
-        min-height: 0;
-        resize: none;
-        overflow: visible;
-    }
-
-    .step {
-        margin-bottom: 2mm;
-        border: 1px solid #aab5bf;
-    }
-
-    .step-header {
-        padding: 2mm 3mm;
-        background: #eaf1f7 !important;
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
-    }
-
-    .step-body {
-        padding: 2mm;
-    }
-
-    .step-fields {
-        grid-template-columns: 1fr 1.3fr 25mm 1fr 1fr;
-        gap: 2mm;
-    }
-
-    .photo {
-        width: 14mm;
-        height: 11mm;
-        border-radius: 1mm;
-    }
-
-    .photo-list {
-        gap: 1mm;
-        margin-top: 1mm;
-    }
+  body { background:white; }
+  header,.no-print,button,.photo-label { display:none !important; }
+  main { max-width:none; padding:0; }
+  .panel,.step { border:1px solid #aaa; border-radius:0; }
 }
 </style>
 </head>
 
 <body>
-<div class="container">
+<header class="no-print">
+  <h1>Service Report</h1>
+  <p>Mobile-friendly · Save draft · Export PDF</p>
+</header>
 
-<section class="card">
-
-    <h1>SERVICE REPORT</h1>
-    <div class="small">Service / Maintenance Record</div>
-
-    <div class="header-fields">
-
-        <div>
-            <label>Customer Name</label>
-            <input id="customer" placeholder="Customer Name">
-        </div>
-
-        <div>
-            <label>Machine Name</label>
-            <input id="machine" placeholder="Machine Name">
-        </div>
-
-        <div>
-            <label>Date</label>
-            <input id="date" type="date">
-        </div>
-
-        <div>
-            <label>Case No.</label>
-            <input id="caseNo" placeholder="Case Number">
-        </div>
-
+<main>
+  <section class="panel no-print">
+    <h2>ข้อมูลรายงาน</h2>
+    <div class="grid">
+      <div class="field">
+        <label for="reportNo">Report No.</label>
+        <input id="reportNo" type="text" placeholder="เช่น SR-2026-001">
+      </div>
+      <div class="field">
+        <label for="reportDate">Date</label>
+        <input id="reportDate" type="date">
+      </div>
+      <div class="field">
+        <label for="customer">Customer</label>
+        <input id="customer" type="text" placeholder="ชื่อลูกค้า">
+      </div>
+      <div class="field">
+        <label for="machine">Machine / Model</label>
+        <input id="machine" type="text" placeholder="รุ่นเครื่องจักร">
+      </div>
+      <div class="field">
+        <label for="serial">Serial No.</label>
+        <input id="serial" type="text" placeholder="Serial number">
+      </div>
+      <div class="field">
+        <label for="engineer">Service Engineer</label>
+        <input id="engineer" type="text" placeholder="ชื่อผู้ปฏิบัติงาน">
+      </div>
     </div>
-
-    <div class="buttons no-print">
-        <button class="primary" onclick="addStep()">
-            + เพิ่มขั้นตอน
-        </button>
-
-        <button class="secondary" onclick="saveDraft()">
-            บันทึกฉบับร่าง
-        </button>
-
-        <button class="secondary" onclick="loadDraft()">
-            โหลดฉบับร่าง
-        </button>
-
-        <button class="primary" onclick="printReport()">
-            พิมพ์ / บันทึก PDF
-        </button>
+    <div class="field">
+      <label for="problem">Customer Complaint / Problem</label>
+      <textarea id="problem" placeholder="รายละเอียดปัญหาที่ได้รับแจ้ง"></textarea>
     </div>
+  </section>
 
-</section>
-
-<section class="card">
-    <h2>Repair Details</h2>
-    <div class="small no-print">
-        ลำดับข้อมูล: Target → Action → Photo(s) → Result → Next Action
+  <section class="panel no-print">
+    <h2>เครื่องมือจัดการรายงาน</h2>
+    <div class="button-row">
+      <button class="primary" onclick="addStep()">＋ เพิ่ม Step</button>
+      <button class="secondary" onclick="saveDraft()">บันทึกร่าง</button>
+      <button class="secondary" onclick="loadDraft()">โหลดร่าง</button>
+      <button class="success" onclick="exportPDF()">สร้าง PDF</button>
     </div>
+    <div id="status" role="status" aria-live="polite"></div>
+    <p class="small-note">
+      ร่างจะถูกบันทึกไว้ในเบราว์เซอร์ของอุปกรณ์นี้
+      ควรดาวน์โหลด PDF หรือสำรองข้อมูลเป็นระยะ
+    </p>
+  </section>
+
+  <section id="stepsPanel" class="panel">
+    <h2>Service Steps</h2>
     <div id="steps"></div>
-</section>
+    <button class="primary no-print" style="width:100%" onclick="addStep()">
+      ＋ เพิ่ม Step
+    </button>
+  </section>
 
+  <section class="panel no-print">
+    <h2>ประโยคสำเร็จรูป</h2>
+    <p class="small-note">เพิ่มข้อความที่ใช้บ่อย เพื่อเลือกใส่ในแต่ละ Step ได้รวดเร็ว</p>
+    <div class="field">
+      <label for="presetCategory">ประเภทข้อความ</label>
+      <select id="presetCategory">
+        <option value="target">Target</option>
+        <option value="action">Action</option>
+        <option value="result">Result</option>
+        <option value="next">Next Action</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="presetText">ข้อความ</label>
+      <textarea id="presetText" placeholder="พิมพ์ประโยคสำเร็จรูป"></textarea>
+    </div>
+    <button class="primary" style="width:100%" onclick="addPreset()">เพิ่มประโยค</button>
+    <hr>
+    <div id="presetManager"></div>
+    <hr>
+    <div class="button-row">
+      <button class="secondary" onclick="exportPresets()">สำรองประโยค</button>
+      <button class="secondary" onclick="document.getElementById('presetFile').click()">นำเข้าประโยค</button>
+      <input id="presetFile" class="photo-input" type="file" accept=".json,application/json" onchange="importPresets(event)">
+    </div>
+  </section>
+</main>
+
+<!-- พื้นที่สร้าง PDF -->
+<div id="pdfArea" style="position:absolute;left:-100000px;top:0;width:1100px;background:white;padding:20px;">
+  <div id="pdfContent"></div>
 </div>
 
-<template id="stepTemplate">
-<div class="step">
-
-    <div class="step-header">
-        <span class="step-title">Step 1</span>
-
-        <button class="danger no-print"
-                onclick="removeStep(this)">
-            ลบขั้นตอน
-        </button>
-    </div>
-
-    <div class="step-body">
-
-        <div class="step-fields">
-
-            <div>
-                <label>Target</label>
-                <textarea data-field="target"
-                          placeholder="เป้าหมาย / อาการ"></textarea>
-                <select class="preset no-print"
-                        data-field="target"
-                        onchange="applyPreset(this)">
-                    <option value="">เลือกข้อความที่ใช้บ่อย...</option>
-                </select>
-            </div>
-
-            <div>
-                <label>Action</label>
-                <textarea data-field="action"
-                          placeholder="รายละเอียดการดำเนินงาน"></textarea>
-                <select class="preset no-print"
-                        data-field="action"
-                        onchange="applyPreset(this)">
-                    <option value="">เลือกข้อความที่ใช้บ่อย...</option>
-                </select>
-            </div>
-
-            <div class="photo-area">
-                <label>Photo(s)</label>
-
-                <input class="no-print"
-                       type="file"
-                       accept="image/*"
-                       multiple
-                       onchange="addPhotos(this)">
-
-                <div class="photo-list"></div>
-
-                <div class="small no-print">
-                    รูปจะถูกย่อและบีบอัดก่อนเก็บ
-                </div>
-            </div>
-
-            <div>
-                <label>Result</label>
-                <textarea data-field="result"
-                          placeholder="ผลการดำเนินงาน"></textarea>
-                <select class="preset no-print"
-                        data-field="result"
-                        onchange="applyPreset(this)">
-                    <option value="">เลือกข้อความที่ใช้บ่อย...</option>
-                </select>
-            </div>
-
-            <div>
-                <label>Next Action</label>
-                <textarea data-field="next"
-                          placeholder="ขั้นตอนถัดไป"></textarea>
-                <select class="preset no-print"
-                        data-field="next"
-                        onchange="applyPreset(this)">
-                    <option value="">เลือกข้อความที่ใช้บ่อย...</option>
-                </select>
-            </div>
-
-        </div>
-
-    </div>
-</div>
-</template>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
 <script>
-const stepsContainer = document.getElementById("steps");
+"use strict";
 
-/* ข้อความสำเร็จรูป สามารถเพิ่มหรือลบรายการได้ */
-const presets = {
-    target: [
-        "ตรวจสอบอาการเครื่องขัดข้อง",
-        "ตรวจสอบ Error Code / Alarm",
-        "ตรวจสอบระบบไฟฟ้าและแหล่งจ่ายไฟ",
-        "ตรวจสอบระบบลม Pneumatic",
-        "ตรวจสอบเซนเซอร์",
-        "ตรวจสอบมอเตอร์ / Step Motor",
-        "ตรวจสอบ Solenoid Valve",
-        "ตรวจสอบการทำงานหลังซ่อม"
-    ],
+const DB_NAME = "ServiceReportMobileDB";
+const STORE_NAME = "drafts";
+const DRAFT_KEY = "current";
+const PRESET_KEY = "serviceReportMobilePresets";
 
-    action: [
-        "ตรวจสอบและวิเคราะห์หาสาเหตุ",
-        "ตรวจสอบสายไฟและจุดต่อ",
-        "ทำความสะอาดอุปกรณ์",
-        "ถอดตรวจสอบอุปกรณ์ที่ผิดปกติ",
-        "เปลี่ยนอุปกรณ์ที่ชำรุด",
-        "ปรับตั้งค่าและ Calibrate อุปกรณ์",
-        "ติดตั้งอะไหล่สำรองเพื่อทดสอบ",
-        "ทดสอบการทำงานร่วมกับลูกค้า"
-    ],
-
-    result: [
-        "เครื่องกลับมาทำงานปกติ",
-        "ทดสอบแล้วสามารถใช้งานได้ปกติ",
-        "พบอุปกรณ์ชำรุด ต้องเปลี่ยนใหม่",
-        "อาการยังคงเกิดซ้ำ ต้องตรวจสอบเพิ่มเติม",
-        "ใช้งานได้ชั่วคราวหลังติดตั้งอะไหล่สำรอง",
-        "ไม่พบความผิดปกติระหว่างทดสอบ",
-        "รออะไหล่เพื่อดำเนินการต่อ"
-    ],
-
-    next: [
-        "ปิดเคสหลังลูกค้ายืนยันผล",
-        "ติดตามอาการหลังใช้งาน",
-        "เสนอราคาอะไหล่ทดแทน",
-        "รออะไหล่และนัดหมายเข้าดำเนินการ",
-        "ประสานงานกับทีม Technical Support",
-        "ลูกค้าดำเนินการเองและแจ้งผลกลับ",
-        "ยังไม่มีแผนดำเนินการเพิ่มเติม"
-    ]
+const defaultPresets = {
+  target: [
+    "Inspect the machine and identify the root cause.",
+    "Check the machine operation and error condition."
+  ],
+  action: [
+    "Inspected the machine and checked the error history.",
+    "Checked the electrical connections and related components.",
+    "Replaced the defective component and performed a functional test."
+  ],
+  result: [
+    "Machine operation returned to normal.",
+    "The issue could not be reproduced during testing.",
+    "Further investigation is required."
+  ],
+  next: [
+    "Monitor the machine operation.",
+    "Follow up with the customer.",
+    "Prepare a quotation for the required spare parts."
+  ]
 };
 
-/* เติมตัวเลือกข้อความสำเร็จรูป */
-function populatePresets(step) {
-    step.querySelectorAll("select.preset").forEach(select => {
-        const field = select.dataset.field;
+let presets = loadPresetsFromLocal();
+let stepCounter = 0;
 
-        presets[field].forEach(text => {
-            const option = document.createElement("option");
-            option.value = text;
-            option.textContent = text;
-            select.appendChild(option);
-        });
-    });
+function setStatus(message, error = false) {
+  const el = document.getElementById("status");
+  el.textContent = message;
+  el.style.color = error ? "#b91c1c" : "#166534";
 }
 
-/* เลือกข้อความแล้วใส่ลงในช่องข้อความ */
-function applyPreset(select) {
-    if (!select.value) return;
-
-    const field = select.dataset.field;
-    const textarea = select.parentElement.querySelector(
-        'textarea[data-field="' + field + '"]'
-    );
-
-    textarea.value = select.value;
-    textarea.dispatchEvent(new Event("input"));
-    select.value = "";
+function loadPresetsFromLocal() {
+  try {
+    const saved = localStorage.getItem(PRESET_KEY);
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      return {
+        target: Array.isArray(parsed.target) ? parsed.target : [...defaultPresets.target],
+        action: Array.isArray(parsed.action) ? parsed.action : [...defaultPresets.action],
+        result: Array.isArray(parsed.result) ? parsed.result : [...defaultPresets.result],
+        next: Array.isArray(parsed.next) ? parsed.next : [...defaultPresets.next]
+      };
+    }
+  } catch (e) {
+    console.warn("Could not read presets", e);
+  }
+  return JSON.parse(JSON.stringify(defaultPresets));
 }
 
-/* เพิ่มขั้นตอน */
+function savePresetsToLocal() {
+  try {
+    localStorage.setItem(PRESET_KEY, JSON.stringify(presets));
+    renderPresetManager();
+  } catch (e) {
+    setStatus("บันทึกประโยคไม่สำเร็จ พื้นที่เก็บข้อมูลอาจเต็ม", true);
+  }
+}
+
+function escapeHTML(value) {
+  return String(value ?? "").replace(/[&<>"']/g, c => ({
+    "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;"
+  })[c]);
+}
+
+function addPreset() {
+  const category = document.getElementById("presetCategory").value;
+  const text = document.getElementById("presetText").value.trim();
+  if (!text) {
+    setStatus("กรุณากรอกข้อความก่อน", true);
+    return;
+  }
+  presets[category].push(text);
+  document.getElementById("presetText").value = "";
+  savePresetsToLocal();
+  setStatus("เพิ่มประโยคสำเร็จ");
+}
+
+function deletePreset(category, index) {
+  if (!confirm("ต้องการลบประโยคนี้หรือไม่?")) return;
+  presets[category].splice(index, 1);
+  savePresetsToLocal();
+  setStatus("ลบประโยคแล้ว");
+}
+
+function renderPresetManager() {
+  const labels = {
+    target:"Target",
+    action:"Action",
+    result:"Result",
+    next:"Next Action"
+  };
+  const root = document.getElementById("presetManager");
+  root.innerHTML = Object.keys(labels).map(category => `
+    <h3>${labels[category]}</h3>
+    ${presets[category].map((phrase, i) => `
+      <div class="preset-row">
+        <div style="flex:1;min-width:0;padding:10px 0;overflow-wrap:anywhere">
+          ${escapeHTML(phrase)}
+        </div>
+        <button class="danger" onclick="deletePreset('${category}',${i})" aria-label="ลบประโยค">ลบ</button>
+      </div>
+    `).join("") || '<p class="small-note">ยังไม่มีประโยค</p>'}
+  `).join("");
+}
+
+function exportPresets() {
+  downloadBlob(
+    new Blob([JSON.stringify(presets, null, 2)], {type:"application/json"}),
+    "service-report-presets.json"
+  );
+}
+
+async function importPresets(event) {
+  const file = event.target.files?.[0];
+  if (!file) return;
+  try {
+    const data = JSON.parse(await file.text());
+    for (const key of ["target","action","result","next"]) {
+      if (!Array.isArray(data[key]) || !data[key].every(x => typeof x === "string")) {
+        throw new Error("รูปแบบไฟล์ไม่ถูกต้อง");
+      }
+    }
+    presets = data;
+    savePresetsToLocal();
+    setStatus("นำเข้าประโยคสำเร็จ");
+  } catch (e) {
+    setStatus("อ่านไฟล์ไม่ได้: " + e.message, true);
+  }
+  event.target.value = "";
+}
+
 function addStep(data = {}) {
-    const template = document.getElementById("stepTemplate");
-    const step = template.content.firstElementChild.cloneNode(true);
+  stepCounter++;
+  const id = "step_" + Date.now() + "_" + stepCounter;
+  const wrapper = document.createElement("div");
+  wrapper.className = "step";
+  wrapper.dataset.stepId = id;
 
-    step.querySelectorAll("textarea").forEach(textarea => {
-        textarea.value = data[textarea.dataset.field] || "";
+  wrapper.innerHTML = `
+    <div class="step-head">
+      <span class="step-number">Step ${document.querySelectorAll("#steps .step").length + 1}</span>
+      <button type="button" class="danger no-print" onclick="removeStep(this)">ลบ Step</button>
+    </div>
 
-        textarea.addEventListener("input", () => {
-            textarea.style.height = "auto";
-            textarea.style.height =
-                Math.max(65, textarea.scrollHeight) + "px";
-        });
-    });
+    ${makeTextField("Target", "target", data.target || "", id)}
+    ${makeTextField("Action", "action", data.action || "", id)}
 
-    populatePresets(step);
+    <div class="field">
+      <label>Photo(s)</label>
+      <label class="photo-label no-print" for="${id}_photo">📷 ถ่ายรูป / เลือกรูป</label>
+      <input id="${id}_photo" class="photo-input no-print" type="file"
+        accept="image/*" capture="environment" multiple
+        onchange="handlePhotos(this)">
+      <div class="photo-grid"></div>
+      <p class="small-note no-print">ระบบจะย่อรูปก่อนบันทึก เพื่อลดพื้นที่จัดเก็บ</p>
+    </div>
 
-    stepsContainer.appendChild(step);
+    ${makeTextField("Result", "result", data.result || "", id)}
+    ${makeTextField("Next Action", "next", data.next || "", id)}
+  `;
 
-    if (data.photos) {
-        const list = step.querySelector(".photo-list");
+  document.getElementById("steps").appendChild(wrapper);
 
-        data.photos.forEach(photo => {
-            createPhoto(list, photo);
-        });
-    }
+  const photoGrid = wrapper.querySelector(".photo-grid");
+  (Array.isArray(data.photos) ? data.photos : []).forEach(src => {
+    addPhotoToGrid(photoGrid, src);
+  });
 
-    updateStepNumbers();
+  updateStepNumbers();
 }
 
-/* ลบขั้นตอน */
+function makeTextField(label, category, value, id) {
+  const fieldId = id + "_" + category;
+  return `
+    <div class="field">
+      <label for="${fieldId}">${label}</label>
+      <textarea id="${fieldId}" data-field="${category}" placeholder="${label}...">${escapeHTML(value)}</textarea>
+      <div class="preset-row no-print">
+        <select aria-label="เลือกประโยคสำเร็จรูป" onchange="applyPreset(this,'${fieldId}')">
+          <option value="">เลือกประโยคสำเร็จรูป...</option>
+          ${presets[category].map((p,i) => `<option value="${i}">${escapeHTML(p)}</option>`).join("")}
+        </select>
+        <button type="button" class="secondary" onclick="clearPresetSelect(this)">ล้าง</button>
+      </div>
+    </div>
+  `;
+}
+
+function applyPreset(select, fieldId) {
+  if (select.value === "") return;
+  const category = document.getElementById(fieldId).dataset.field;
+  const phrase = presets[category][Number(select.value)];
+  if (phrase === undefined) return;
+
+  const field = document.getElementById(fieldId);
+  field.value = field.value.trim()
+    ? field.value.trim() + "\n" + phrase
+    : phrase;
+  select.value = "";
+}
+
+function clearPresetSelect(button) {
+  const select = button.parentElement.querySelector("select");
+  select.value = "";
+}
+
 function removeStep(button) {
-    button.closest(".step").remove();
-    updateStepNumbers();
+  if (!confirm("ต้องการลบ Step นี้หรือไม่?")) return;
+  button.closest(".step").remove();
+  updateStepNumbers();
 }
 
-/* จัดหมายเลขขั้นตอนใหม่ */
 function updateStepNumbers() {
-    document.querySelectorAll(".step").forEach((step, index) => {
-        step.querySelector(".step-title").textContent =
-            "Step " + (index + 1);
-    });
+  document.querySelectorAll("#steps .step").forEach((step, i) => {
+    step.querySelector(".step-number").textContent = "Step " + (i + 1);
+  });
 }
 
-/* ย่อและบีบอัดรูปก่อนเก็บ */
+function addPhotoToGrid(grid, src) {
+  const item = document.createElement("div");
+  item.className = "photo-item";
+  item.innerHTML = `
+    <img alt="Service photo">
+    <button type="button" class="danger no-print" onclick="this.closest('.photo-item').remove()">ลบรูป</button>
+  `;
+  item.querySelector("img").src = src;
+  grid.appendChild(item);
+}
+
+async function handlePhotos(input) {
+  const files = Array.from(input.files || []);
+  const grid = input.closest(".field").querySelector(".photo-grid");
+
+  for (const file of files) {
+    if (!file.type.startsWith("image/")) continue;
+    try {
+      const compressed = await compressImage(file);
+      addPhotoToGrid(grid, compressed);
+    } catch (e) {
+      setStatus("อ่านรูปไม่สำเร็จ: " + file.name, true);
+    }
+  }
+  input.value = "";
+}
+
 function compressImage(file) {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-
-        reader.onload = () => {
-            const image = new Image();
-
-            image.onload = () => {
-                const maxSize = 1000;
-                const scale = Math.min(
-                    1,
-                    maxSize / Math.max(image.width, image.height)
-                );
-
-                const canvas = document.createElement("canvas");
-                canvas.width = Math.round(image.width * scale);
-                canvas.height = Math.round(image.height * scale);
-
-                const context = canvas.getContext("2d");
-
-                context.drawImage(
-                    image,
-                    0,
-                    0,
-                    canvas.width,
-                    canvas.height
-                );
-
-                resolve(canvas.toDataURL("image/jpeg", 0.68));
-            };
-
-            image.onerror = reject;
-            image.src = reader.result;
-        };
-
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
-    });
-}
-
-/* เพิ่มรูปภาพ */
-async function addPhotos(input) {
-    const list = input.parentElement.querySelector(".photo-list");
-
-    for (const file of input.files) {
-        try {
-            const compressed = await compressImage(file);
-            createPhoto(list, compressed);
-        } catch (error) {
-            alert("ไม่สามารถอ่านรูปภาพนี้ได้");
-        }
-    }
-
-    input.value = "";
-}
-
-/* แสดงรูปในรายงาน */
-function createPhoto(list, src) {
-    const wrapper = document.createElement("div");
-    wrapper.className = "photo-item";
-
-    const image = document.createElement("img");
-    image.className = "photo";
-    image.src = src;
-    image.alt = "Service photo";
-
-    const button = document.createElement("button");
-    button.className = "remove-photo danger no-print";
-    button.textContent = "ลบ";
-
-    button.onclick = () => wrapper.remove();
-
-    wrapper.appendChild(image);
-    wrapper.appendChild(button);
-
-    list.appendChild(wrapper);
-}
-
-/* อ่านข้อมูลทั้งหมด */
-function collectData(includePhotos = true) {
-    return {
-        customer: document.getElementById("customer").value,
-        machine: document.getElementById("machine").value,
-        date: document.getElementById("date").value,
-        caseNo: document.getElementById("caseNo").value,
-
-        steps: Array.from(
-            stepsContainer.querySelectorAll(".step")
-        ).map(step => {
-            const item = {};
-
-            ["target", "action", "result", "next"].forEach(field => {
-                item[field] = step.querySelector(
-                    'textarea[data-field="' + field + '"]'
-                ).value;
-            });
-
-            item.photos = includePhotos
-                ? Array.from(step.querySelectorAll("img.photo"))
-                    .map(image => image.src)
-                : [];
-
-            return item;
-        })
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = reject;
+    reader.onload = () => {
+      const img = new Image();
+      img.onerror = reject;
+      img.onload = () => {
+        const maxSide = 1400;
+        const ratio = Math.min(1, maxSide / Math.max(img.width, img.height));
+        const canvas = document.createElement("canvas");
+        canvas.width = Math.max(1, Math.round(img.width * ratio));
+        canvas.height = Math.max(1, Math.round(img.height * ratio));
+        const ctx = canvas.getContext("2d");
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        resolve(canvas.toDataURL("image/jpeg", 0.78));
+      };
+      img.src = reader.result;
     };
+    reader.readAsDataURL(file);
+  });
 }
 
-/* สร้างหรือเปิดฐานข้อมูล IndexedDB */
-function openDatabase() {
-    return new Promise((resolve, reject) => {
-        const request = indexedDB.open("ServiceReportDB", 1);
+function getReportData() {
+  const get = id => document.getElementById(id).value;
+  const steps = Array.from(document.querySelectorAll("#steps .step")).map(step => ({
+    target: step.querySelector('[data-field="target"]').value,
+    action: step.querySelector('[data-field="action"]').value,
+    photos: Array.from(step.querySelectorAll(".photo-item img")).map(img => img.src),
+    result: step.querySelector('[data-field="result"]').value,
+    next: step.querySelector('[data-field="next"]').value
+  }));
 
-        request.onupgradeneeded = () => {
-            const database = request.result;
-
-            if (!database.objectStoreNames.contains("drafts")) {
-                database.createObjectStore("drafts");
-            }
-        };
-
-        request.onsuccess = () => resolve(request.result);
-        request.onerror = () => reject(request.error);
-    });
+  return {
+    reportNo:get("reportNo"),
+    reportDate:get("reportDate"),
+    customer:get("customer"),
+    machine:get("machine"),
+    serial:get("serial"),
+    engineer:get("engineer"),
+    problem:get("problem"),
+    steps
+  };
 }
 
-/* บันทึกฉบับร่าง */
+function setReportData(data) {
+  const fields = ["reportNo","reportDate","customer","machine","serial","engineer","problem"];
+  fields.forEach(key => {
+    document.getElementById(key).value = data[key] || "";
+  });
+
+  document.getElementById("steps").innerHTML = "";
+  stepCounter = 0;
+  (Array.isArray(data.steps) ? data.steps : []).forEach(addStep);
+  if (!data.steps || !data.steps.length) addStep();
+}
+
+function openDB() {
+  return new Promise((resolve, reject) => {
+    if (!("indexedDB" in window)) {
+      reject(new Error("เบราว์เซอร์นี้ไม่รองรับ IndexedDB"));
+      return;
+    }
+    const request = indexedDB.open(DB_NAME, 1);
+    request.onupgradeneeded = () => {
+      const db = request.result;
+      if (!db.objectStoreNames.contains(STORE_NAME)) {
+        db.createObjectStore(STORE_NAME);
+      }
+    };
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
+
 async function saveDraft() {
-    try {
-        const database = await openDatabase();
-        const report = collectData(true);
+  try {
+    const db = await openDB();
+    const data = getReportData();
 
-        await new Promise((resolve, reject) => {
-            const transaction = database.transaction(
-                "drafts",
-                "readwrite"
-            );
+    await new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE_NAME, "readwrite");
+      tx.objectStore(STORE_NAME).put(data, DRAFT_KEY);
+      tx.oncomplete = resolve;
+      tx.onerror = () => reject(tx.error);
+      tx.onabort = () => reject(tx.error);
+    });
 
-            transaction.objectStore("drafts").put(report, "latest");
-
-            transaction.oncomplete = resolve;
-            transaction.onerror = () => reject(transaction.error);
-            transaction.onabort = () => reject(transaction.error);
-        });
-
-        database.close();
-
-        alert("บันทึกฉบับร่างพร้อมรูปภาพเรียบร้อยแล้ว");
-
-    } catch (error) {
-        /* สำรองเป็นข้อความอย่างเดียว หากเก็บรูปไม่สำเร็จ */
-        try {
-            const report = collectData(false);
-
-            localStorage.setItem(
-                "ServiceReportTextDraft",
-                JSON.stringify(report)
-            );
-
-            alert(
-                "บันทึกข้อความแล้ว แต่ไม่สามารถเก็บรูปภาพได้ " +
-                "โปรดลดจำนวนรูปหรือเปิดเว็บในเบราว์เซอร์หลัก"
-            );
-
-        } catch (fallbackError) {
-            alert(
-                "บันทึกไม่สำเร็จ กรุณาตรวจสอบพื้นที่จัดเก็บของเบราว์เซอร์"
-            );
-        }
-    }
+    db.close();
+    setStatus("บันทึกร่างในอุปกรณ์นี้แล้ว ✓");
+  } catch (e) {
+    console.error(e);
+    setStatus("บันทึกไม่สำเร็จ พื้นที่อาจเต็ม กรุณาลดจำนวนหรือขนาดรูป", true);
+  }
 }
 
-/* โหลดฉบับร่าง */
 async function loadDraft() {
-    try {
-        let report = null;
+  try {
+    const db = await openDB();
+    const data = await new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE_NAME, "readonly");
+      const req = tx.objectStore(STORE_NAME).get(DRAFT_KEY);
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(req.error);
+    });
+    db.close();
 
-        try {
-            const database = await openDatabase();
-
-            report = await new Promise((resolve, reject) => {
-                const transaction = database.transaction(
-                    "drafts",
-                    "readonly"
-                );
-
-                const request = transaction
-                    .objectStore("drafts")
-                    .get("latest");
-
-                request.onsuccess = () => resolve(request.result);
-                request.onerror = () => reject(request.error);
-            });
-
-            database.close();
-
-        } catch (error) {
-            console.warn("IndexedDB unavailable", error);
-        }
-
-        if (!report) {
-            const saved = localStorage.getItem(
-                "ServiceReportTextDraft"
-            );
-
-            if (saved) report = JSON.parse(saved);
-        }
-
-        if (!report) {
-            alert("ไม่พบฉบับร่างที่บันทึกไว้");
-            return;
-        }
-
-        document.getElementById("customer").value =
-            report.customer || "";
-
-        document.getElementById("machine").value =
-            report.machine || "";
-
-        document.getElementById("date").value =
-            report.date || "";
-
-        document.getElementById("caseNo").value =
-            report.caseNo || "";
-
-        stepsContainer.innerHTML = "";
-
-        (report.steps || []).forEach(step => addStep(step));
-
-        alert("โหลดฉบับร่างเรียบร้อยแล้ว");
-
-    } catch (error) {
-        alert("โหลดฉบับร่างไม่สำเร็จ กรุณาลองใหม่อีกครั้ง");
+    if (!data) {
+      setStatus("ยังไม่มีร่างที่บันทึกไว้", true);
+      return;
     }
+    setReportData(data);
+    setStatus("โหลดร่างแล้ว ✓");
+  } catch (e) {
+    console.error(e);
+    setStatus("โหลดร่างไม่สำเร็จ", true);
+  }
 }
 
-/* พิมพ์หรือบันทึก PDF */
-function printReport() {
-    try {
-        window.focus();
-        window.print();
-    } catch (error) {
-        alert(
-            "ไม่สามารถเปิดหน้าพิมพ์ได้ " +
-            "กรุณาเปิดเว็บไซต์ด้วย Chrome หรือ Safari โดยตรง"
-        );
-    }
+function buildPDFHTML(data) {
+  const esc = escapeHTML;
+  const stepsHTML = data.steps.map((s, i) => `
+    <tr>
+      <td class="step-cell">${i + 1}</td>
+      <td>${esc(s.target).replace(/\n/g,"<br>")}</td>
+      <td>${esc(s.action).replace(/\n/g,"<br>")}</td>
+      <td>
+        <div class="photos">
+          ${(s.photos || []).map(src => `<img src="${src}" alt="Service photo">`).join("")}
+        </div>
+      </td>
+      <td>${esc(s.result).replace(/\n/g,"<br>")}</td>
+      <td>${esc(s.next).replace(/\n/g,"<br>")}</td>
+    </tr>
+  `).join("");
+
+  return `
+    <style>
+      * { box-sizing:border-box; }
+      body { font-family:Arial,"Noto Sans Thai",sans-serif; color:#111; }
+      .title { text-align:center;font-size:21px;font-weight:bold;margin-bottom:4px; }
+      .subtitle { text-align:center;font-size:11px;margin-bottom:12px; }
+      .meta { width:100%;border-collapse:collapse;font-size:10px;margin-bottom:10px; }
+      .meta td { border:1px solid #777;padding:5px;vertical-align:top; }
+      .label { font-weight:bold; }
+      .problem { font-size:10px;border:1px solid #777;padding:7px;margin-bottom:10px; }
+      table.report { width:100%;border-collapse:collapse;table-layout:fixed;font-size:9px; }
+      table.report th,table.report td { border:1px solid #666;padding:5px;vertical-align:top;overflow-wrap:anywhere; }
+      table.report th { background:#e8edf3;text-align:center; }
+      .step-cell { text-align:center;font-weight:bold; }
+      .photos { display:flex;flex-wrap:wrap;gap:4px; }
+      .photos img { width:85px;height:65px;object-fit:contain; }
+      .footer { font-size:9px;margin-top:12px; }
+      tr { page-break-inside:avoid; }
+    </style>
+
+    <div class="title">SERVICE REPORT</div>
+    <div class="subtitle">Service Activity Record</div>
+
+    <table class="meta">
+      <tr>
+        <td><span class="label">Report No.:</span> ${esc(data.reportNo)}</td>
+        <td><span class="label">Date:</span> ${esc(data.reportDate)}</td>
+        <td><span class="label">Customer:</span> ${esc(data.customer)}</td>
+      </tr>
+      <tr>
+        <td><span class="label">Machine / Model:</span> ${esc(data.machine)}</td>
+        <td><span class="label">Serial No.:</span> ${esc(data.serial)}</td>
+        <td><span class="label">Service Engineer:</span> ${esc(data.engineer)}</td>
+      </tr>
+    </table>
+
+    <div class="problem"><span class="label">Customer Complaint / Problem:</span><br>
+      ${esc(data.problem).replace(/\n/g,"<br>")}
+    </div>
+
+    <table class="report">
+      <colgroup>
+        <col style="width:4%">
+        <col style="width:17%">
+        <col style="width:23%">
+        <col style="width:17%">
+        <col style="width:20%">
+        <col style="width:19%">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Step</th>
+          <th>Target</th>
+          <th>Action</th>
+          <th>Photo(s)</th>
+          <th>Result</th>
+          <th>Next Action</th>
+        </tr>
+      </thead>
+      <tbody>${stepsHTML}</tbody>
+    </table>
+    <div class="footer">Prepared by: ${esc(data.engineer)}</div>
+  `;
 }
 
-/* ตั้งวันที่ปัจจุบัน */
-(function initialize() {
-    const dateField = document.getElementById("date");
+async function exportPDF() {
+  if (typeof html2pdf === "undefined") {
+    setStatus("โหลดเครื่องมือ PDF ไม่สำเร็จ กรุณาตรวจสอบอินเทอร์เน็ตแล้วลองใหม่", true);
+    return;
+  }
 
-    const now = new Date();
-    const localDate = new Date(
-        now.getTime() - now.getTimezoneOffset() * 60000
-    ).toISOString().slice(0, 10);
+  const data = getReportData();
+  const content = document.getElementById("pdfContent");
+  const area = document.getElementById("pdfArea");
+  content.innerHTML = buildPDFHTML(data);
 
-    dateField.value = localDate;
+  setStatus("กำลังสร้าง PDF กรุณารอสักครู่...");
 
-    addStep();
-})();
+  const fileName = (data.reportNo || "Service-Report")
+    .replace(/[\\/:*?"<>|]/g, "-") + ".pdf";
+
+  const options = {
+    margin: [8, 8, 8, 8],
+    filename: fileName,
+    image: {type:"jpeg",quality:0.92},
+    html2canvas: {
+      scale:1.5,
+      useCORS:true,
+      backgroundColor:"#ffffff",
+      logging:false,
+      scrollX:0,
+      scrollY:0
+    },
+    jsPDF: {
+      unit:"mm",
+      format:"a4",
+      orientation:"landscape",
+      compress:true
+    },
+    pagebreak: { mode:["css","legacy"], avoid:["tr"] }
+  };
+
+  try {
+    const worker = html2pdf().set(options).from(content);
+    const pdfBlob = await worker.outputPdf("blob");
+    const file = new File([pdfBlob], fileName, {type:"application/pdf"});
+
+    // บน iPhone/Android ที่รองรับ จะแสดงเมนูแชร์ไฟล์
+    if (navigator.share && navigator.canShare) {
+      try {
+        if (navigator.canShare({files:[file]})) {
+          await navigator.share({
+            files:[file],
+            title:"Service Report",
+            text:"Service Report PDF"
+          });
+          setStatus("สร้าง PDF แล้ว ✓");
+          return;
+        }
+      } catch (shareError) {
+        if (shareError.name === "AbortError") {
+          setStatus("สร้าง PDF แล้ว แต่ยกเลิกการแชร์");
+          return;
+        }
+        console.warn("Share unavailable, falling back to download", shareError);
+      }
+    }
+
+    // สำรองสำหรับเบราว์เซอร์ที่ไม่มี Web Share API
+    downloadBlob(pdfBlob, fileName);
+    setStatus("สร้าง PDF แล้ว ✓ หากไม่พบไฟล์ ให้ตรวจสอบรายการดาวน์โหลด");
+  } catch (e) {
+    console.error(e);
+    setStatus("สร้าง PDF ไม่สำเร็จ กรุณาลองใหม่ หรือลดจำนวนรูปในรายงาน", true);
+  }
+}
+
+function downloadBlob(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  a.style.display = "none";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 60000);
+}
+
+document.getElementById("reportDate").value =
+  new Date().toLocaleDateString("en-CA");
+
+renderPresetManager();
+addStep();
 </script>
-
 </body>
 </html>
