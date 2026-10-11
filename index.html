@@ -853,8 +853,15 @@ async function exportPDF() {
 
   setStatus("กำลังสร้าง PDF กรุณารอสักครู่...");
 
-  const fileName = (data.reportNo || "Service-Report")
-    .replace(/[\\/:*?"<>|]/g, "-") + ".pdf";
+  const safeCustomer = (data.customer || "Customer")
+  .trim()
+  .replace(/[\\/:*?"<>|]/g, "-")
+  .replace(/\s+/g, "_");
+
+const safeDate = (data.reportDate || "No-Date")
+  .replace(/[\\/:*?"<>|]/g, "-");
+
+const fileName = `${safeCustomer}_${safeDate}.pdf`;
 
   const options = {
   margin: [5, 5, 5, 5],
