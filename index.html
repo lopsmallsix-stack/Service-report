@@ -1,268 +1,816 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Service Report Web App (Mobile Optimized)</title>
-    <style>
-        /* --- CSS พื้นฐานและระบบ Layout --- */
-        body {
-            font-family: 'Sarabun', sans-serif, Arial;
-            margin: 0;
-            padding: 10px;
-            background-color: #f4f6f9;
-        }
-        .container {
-            max-width: 1100px;
-            margin: 0 auto;
-            background: #fff;
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-        h1, h2 {
-            text-align: center;
-            color: #333;
-            margin-bottom: 10px;
-        }
-        .action-bar {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-bottom: 20px;
-            background: #eef2f7;
-            padding: 10px;
-            border-radius: 6px;
-        }
-        .action-bar button:last-child {
-            grid-column: span 2; /* ปุ่มพิมพ์เต็มความกว้างในมือถือ */
-        }
-        button {
-            padding: 12px 15px;
-            font-size: 15px;
-            cursor: pointer;
-            border: none;
-            border-radius: 6px;
-            font-weight: bold;
-            transition: 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 5px;
-        }
-        .btn-success { background-color: #28a745; color: white; }
-        .btn-primary { background-color: #007bff; color: white; }
-        .btn-info { background-color: #17a2b8; color: white; }
-        .btn-danger { background-color: #dc3545; color: white; }
-        button:hover { opacity: 0.9; }
-        
-        .meta-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-        @media (min-width: 768px) {
-            .meta-grid { grid-template-columns: repeat(2, 1fr); }
-            .action-bar { grid-template-columns: repeat(3, 1fr); }
-            .action-bar button:last-child { grid-column: auto; }
-            body { padding: 20px; }
-            .container { padding: 30px; }
-        }
-        .form-group {
-            display: flex;
-            flex-direction: column;
-        }
-        .form-group label {
-            font-weight: bold;
-            margin-bottom: 5px;
-            color: #555;
-            font-size: 14px;
-        }
-        .form-group input {
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            font-size: 15px;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Service Report</title>
 
-        /* --- สไตล์แสดงผลส่วน Repair Details โหมดหน้าจอปกติ --- */
-        .step-table-wrapper {
-            overflow-x: auto;
-            margin-top: 15px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        th, td {
-            border: 1px solid #aaa;
-            padding: 10px;
-            text-align: left;
-            vertical-align: top;
-        }
-        th { background-color: #f2f2f2; }
-        
-        .step-row input, .step-row textarea {
-            width: 95%;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-family: inherit;
-            font-size: 14px;
-        }
-        .preview-img {
-            max-width: 120px;
-            max-height: 120px;
-            display: block;
-            margin-top: 8px;
-            border: 1px dashed #ccc;
-            object-fit: contain;
-        }
+<style>
+* {
+    box-sizing: border-box;
+}
 
-        /* 📱 ปรับหน้าตาตารางให้เป็น "การ์ด" เพื่อให้ใช้งานบนมือถือได้ง่าย ไม่ล้นจอ */
-        @media (max-width: 767px) {
-            table, thead, tbody, th, td, tr { 
-                display: block; 
-            }
-            thead { display: none; } /* ซ่อนหัวตารางเดิม */
-            
-            .step-row {
-                background: #fff;
-                border: 2px solid #007bff;
-                border-radius: 8px;
-                margin-bottom: 20px;
-                padding: 12px;
-                position: relative;
-            }
-            .step-row td {
-                border: none;
-                padding: 6px 0;
-                display: flex;
-                flex-direction: column;
-            }
-            /* สร้างหัวข้อจำลองกำกับแต่ละช่องในมือถือ */
-            .step-row td::before {
-                font-weight: bold;
-                color: #007bff;
-                margin-bottom: 4px;
-                font-size: 13px;
-            }
-            .step-row td:nth-of-type(1)::before { content: "ขั้นตอนที่:"; }
-            .step-row td:nth-of-type(2)::before { content: "Target (เป้าหมาย):"; }
-            .step-row td:nth-of-type(3)::before { content: "Action (การแก้ไข):"; }
-            .step-row td:nth-of-type(4)::before { content: "รูปประกอบ:"; }
-            .step-row td:nth-of-type(5)::before { content: "Result (ผลลัพธ์):"; }
-            .step-row td:nth-of-type(6)::before { content: "Next Action (แผนต่อไป):"; }
-            
-            .step-row input, .step-row textarea {
-                width: 100% !important;
-                box-sizing: border-box;
-            }
-            .step-row td:last-child {
-                align-items: flex-end;
-                border-top: 1px dashed #ddd;
-                margin-top: 5px;
-            }
-        }
+body {
+    margin: 0;
+    padding: 15px;
+    background: #f1f4f7;
+    color: #243447;
+    font-family: Arial, Tahoma, sans-serif;
+}
 
-        /* --- 🖨️ CSS พิเศษสำหรับการพิมพ์ออกกระดาษ (Print Media) --- */
-        @media print {
-            /* บังคับให้คืนร่างกลับเป็นตารางแนวนอนตอนสั่งพิมพ์เสมอ ไม่ว่าจะพิมพ์จากอุปกรณ์ใด */
-            table { display: table !important; width: 100% !important; border-collapse: collapse !important; }
-            thead { display: table-header-group !important; }
-            tbody { display: table-row-group !important; }
-            .step-row { display: table-row !important; border: 1px solid #aaa !important; background: transparent !important; padding: 0 !important; }
-            .step-row td { display: table-cell !important; border: 1px solid #aaa !important; padding: 8px !important; flex-direction: row !important; }
-            .step-row td::before { display: none !important; }
-            
-            body { background-color: #fff; padding: 0; }
-            .action-bar, .btn-danger, .btn-primary, input[type="file"], .step-row td:last-child, th:last-child {
-                display: none !important;
-            }
-            .container { box-shadow: none; padding: 0; max-width: 100%; }
-            input, textarea { border: none !important; background: transparent !important; outline: none !important; resize: none !important; }
-            @page { size: A4 landscape; margin: 12mm; }
-        }
-    </style>
+.container {
+    max-width: 1400px;
+    margin: auto;
+}
+
+.card {
+    background: white;
+    padding: 16px;
+    margin-bottom: 14px;
+    border: 1px solid #d8e0e8;
+    border-radius: 8px;
+}
+
+h1 {
+    margin: 0;
+    font-size: 25px;
+    color: #183650;
+}
+
+h2 {
+    font-size: 17px;
+    color: #183650;
+}
+
+label {
+    display: block;
+    font-size: 12px;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+input,
+textarea,
+select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #cbd5df;
+    border-radius: 5px;
+    font-family: inherit;
+    font-size: 13px;
+}
+
+textarea {
+    min-height: 65px;
+    resize: vertical;
+}
+
+button {
+    padding: 9px 13px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.primary {
+    background: #183650;
+    color: white;
+}
+
+.secondary {
+    background: #e8edf2;
+    color: #243447;
+}
+
+.danger {
+    background: #fde8e8;
+    color: #a32020;
+}
+
+.buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 15px;
+}
+
+.header-fields {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+    margin-top: 18px;
+}
+
+.step {
+    border: 1px solid #bfcbd6;
+    margin-bottom: 12px;
+    background: white;
+    break-inside: avoid;
+}
+
+.step-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 10px;
+    background: #eaf1f7;
+    font-weight: bold;
+}
+
+.step-body {
+    padding: 10px;
+}
+
+.step-fields {
+    display: grid;
+    grid-template-columns: 1fr 1.3fr 125px 1fr 1fr;
+    gap: 10px;
+    align-items: start;
+}
+
+.photo {
+    width: 54px;
+    height: 42px;
+    object-fit: cover;
+    border: 1px solid #cbd5df;
+    border-radius: 3px;
+}
+
+.photo-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-top: 6px;
+}
+
+.photo-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.remove-photo {
+    padding: 3px 5px;
+    margin-top: 3px;
+    font-size: 10px;
+}
+
+.preset {
+    margin-top: 5px;
+    font-size: 11px;
+    padding: 5px;
+}
+
+.small {
+    font-size: 11px;
+    color: #607080;
+    margin-top: 5px;
+}
+
+@media (max-width: 850px) {
+    .header-fields {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .step-fields {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .photo-area {
+        grid-column: span 2;
+    }
+}
+
+@page {
+    size: A4 landscape;
+    margin: 8mm;
+}
+
+@media print {
+    body {
+        background: white;
+        padding: 0;
+        font-size: 9pt;
+    }
+
+    .container {
+        max-width: none;
+    }
+
+    .card {
+        padding: 0;
+        margin-bottom: 4mm;
+        border: none;
+        border-radius: 0;
+    }
+
+    .no-print,
+    .buttons,
+    .preset,
+    .remove-photo,
+    .small {
+        display: none !important;
+    }
+
+    h1 {
+        font-size: 17pt;
+    }
+
+    h2 {
+        font-size: 12pt;
+        margin-bottom: 5px;
+    }
+
+    .header-fields {
+        gap: 3mm;
+        margin-top: 3mm;
+    }
+
+    label {
+        font-size: 7pt;
+        margin-bottom: 1mm;
+    }
+
+    input,
+    textarea {
+        border: none;
+        border-radius: 0;
+        padding: 1mm 0;
+        background: transparent;
+        color: black;
+        font-size: 8pt;
+    }
+
+    textarea {
+        min-height: 0;
+        resize: none;
+        overflow: visible;
+    }
+
+    .step {
+        margin-bottom: 2mm;
+        border: 1px solid #aab5bf;
+    }
+
+    .step-header {
+        padding: 2mm 3mm;
+        background: #eaf1f7 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    .step-body {
+        padding: 2mm;
+    }
+
+    .step-fields {
+        grid-template-columns: 1fr 1.3fr 25mm 1fr 1fr;
+        gap: 2mm;
+    }
+
+    .photo {
+        width: 14mm;
+        height: 11mm;
+        border-radius: 1mm;
+    }
+
+    .photo-list {
+        gap: 1mm;
+        margin-top: 1mm;
+    }
+}
+</style>
 </head>
+
 <body>
-
 <div class="container">
+
+<section class="card">
+
     <h1>SERVICE REPORT</h1>
-    <h2>Service / Maintenance Record</h2>
+    <div class="small">Service / Maintenance Record</div>
 
-    <!-- ปุ่มกดขนาดใหญ่จิ้มง่ายในมือถือ -->
-    <div class="action-bar">
-        <button type="button" class="btn-success" onclick="saveDraft()">💾 บันทึกฉบับร่าง</button>
-        <button type="button" class="btn-info" onclick="loadDraft()">📂 โหลดฉบับร่าง</button>
-        <button type="button" class="btn-primary" onclick="triggerPrint()">🖨️ พิมพ์ / บันทึก PDF</button>
-    </div>
+    <div class="header-fields">
 
-    <div class="meta-grid">
-        <div class="form-group">
+        <div>
             <label>Customer Name</label>
-            <input type="text" id="custName">
+            <input id="customer" placeholder="Customer Name">
         </div>
-        <div class="form-group">
+
+        <div>
             <label>Machine Name</label>
-            <input type="text" id="machineName">
+            <input id="machine" placeholder="Machine Name">
         </div>
-        <div class="form-group">
+
+        <div>
             <label>Date</label>
-            <input type="date" id="reportDate">
+            <input id="date" type="date">
         </div>
-        <div class="form-group">
+
+        <div>
             <label>Case No.</label>
-            <input type="text" id="caseNo">
+            <input id="caseNo" placeholder="Case Number">
         </div>
+
     </div>
 
-    <h2>Repair Details</h2>
-    <button type="button" class="btn-primary" style="margin-bottom: 10px; width: 100%; max-width: 200px;" onclick="addStepRow()">➕ เพิ่มขั้นตอน</button>
-    
-    <div class="step-table-wrapper">
-        <table>
-            <thead>
-                <tr>
-                    <th style="width: 5%;">Step</th>
-                    <th style="width: 20%;">Target</th>
-                    <th style="width: 25%;">Action</th>
-                    <th style="width: 15%;">รูปประกอบ</th>
-                    <th style="width: 20%;">Result</th>
-                    <th style="width: 10%;">Next Action</th>
-                    <th style="width: 5%;">จัดการ</th>
-                </tr>
-            </thead>
-            <tbody id="stepTableBody">
-                <!-- แถวจะถูกเพิ่มที่นี่ -->
-            </tbody>
-        </table>
+    <div class="buttons no-print">
+        <button class="primary" onclick="addStep()">
+            + เพิ่มขั้นตอน
+        </button>
+
+        <button class="secondary" onclick="saveDraft()">
+            บันทึกฉบับร่าง
+        </button>
+
+        <button class="secondary" onclick="loadDraft()">
+            โหลดฉบับร่าง
+        </button>
+
+        <button class="primary" onclick="printReport()">
+            พิมพ์ / บันทึก PDF
+        </button>
     </div>
+
+</section>
+
+<section class="card">
+    <h2>Repair Details</h2>
+    <div class="small no-print">
+        ลำดับข้อมูล: Target → Action → Photo(s) → Result → Next Action
+    </div>
+    <div id="steps"></div>
+</section>
+
 </div>
 
-<!-- คลังช้อยส์คำตอบดรอปดาวน์ที่ใช้บ่อย -->
-<datalist id="target-suggestions">
-    <option value="เครื่องจักรหลัก (Main Machine)">
-    <option value="ระบบควบคุม/ไฟฟ้า (Electrical System)">
-    <option value="ปั๊มไฮดรอลิก/ระบบลม (Pump & Pneumatic)">
-    <option value="โครงสร้างภายนอก (Structure & Body)">
-</datalist>
+<template id="stepTemplate">
+<div class="step">
+
+    <div class="step-header">
+        <span class="step-title">Step 1</span>
+
+        <button class="danger no-print"
+                onclick="removeStep(this)">
+            ลบขั้นตอน
+        </button>
+    </div>
+
+    <div class="step-body">
+
+        <div class="step-fields">
+
+            <div>
+                <label>Target</label>
+                <textarea data-field="target"
+                          placeholder="เป้าหมาย / อาการ"></textarea>
+                <select class="preset no-print"
+                        data-field="target"
+                        onchange="applyPreset(this)">
+                    <option value="">เลือกข้อความที่ใช้บ่อย...</option>
+                </select>
+            </div>
+
+            <div>
+                <label>Action</label>
+                <textarea data-field="action"
+                          placeholder="รายละเอียดการดำเนินงาน"></textarea>
+                <select class="preset no-print"
+                        data-field="action"
+                        onchange="applyPreset(this)">
+                    <option value="">เลือกข้อความที่ใช้บ่อย...</option>
+                </select>
+            </div>
+
+            <div class="photo-area">
+                <label>Photo(s)</label>
+
+                <input class="no-print"
+                       type="file"
+                       accept="image/*"
+                       multiple
+                       onchange="addPhotos(this)">
+
+                <div class="photo-list"></div>
+
+                <div class="small no-print">
+                    รูปจะถูกย่อและบีบอัดก่อนเก็บ
+                </div>
+            </div>
+
+            <div>
+                <label>Result</label>
+                <textarea data-field="result"
+                          placeholder="ผลการดำเนินงาน"></textarea>
+                <select class="preset no-print"
+                        data-field="result"
+                        onchange="applyPreset(this)">
+                    <option value="">เลือกข้อความที่ใช้บ่อย...</option>
+                </select>
+            </div>
+
+            <div>
+                <label>Next Action</label>
+                <textarea data-field="next"
+                          placeholder="ขั้นตอนถัดไป"></textarea>
+                <select class="preset no-print"
+                        data-field="next"
+                        onchange="applyPreset(this)">
+                    <option value="">เลือกข้อความที่ใช้บ่อย...</option>
+                </select>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+</template>
 
 <script>
-    let stepCount = 0;
+const stepsContainer = document.getElementById("steps");
 
-    function addStepRow(savedData = null) {
-        stepCount++;
-        const tbody = document.getElementById('stepTableBody');
-        const row = document.createElement('tr');
-        row.className = 'step-row';
-        row.id = `step_row_${stepCount}`;
+/* ข้อความสำเร็จรูป สามารถเพิ่มหรือลบรายการได้ */
+const presets = {
+    target: [
+        "ตรวจสอบอาการเครื่องขัดข้อง",
+        "ตรวจสอบ Error Code / Alarm",
+        "ตรวจสอบระบบไฟฟ้าและแหล่งจ่ายไฟ",
+        "ตรวจสอบระบบลม Pneumatic",
+        "ตรวจสอบเซนเซอร์",
+        "ตรวจสอบมอเตอร์ / Step Motor",
+        "ตรวจสอบ Solenoid Valve",
+        "ตรวจสอบการทำงานหลังซ่อม"
+    ],
 
-        row.innerHTML = `
-            <td style="text-align:center; font-weight:bold;">${stepCount}</td>
-            <td><input type="text" class="t-input" list="target-suggestions" value="${savedData ? savedData.target : ''}" placeholder="เลือกหรือพิมพ์เป้าหมาย..."></td>
-            <td><textarea class="a-input" rows="3" placeholder="ระบุการแก้ไข...">${savedData ? savedData.action : ''}</textarea></td>
-            <td>
-                <input type="file" accept="image/*" onchange="handleImage(this, ${stepCount})" style="width:100%;">
-                <img id="prev_${stepCount}" class="preview-img" src="${savedData ? savedData.img : ''}" style="${savedData && savedData.img ? 'display:block;' : 'display:none;'}">
+    action: [
+        "ตรวจสอบและวิเคราะห์หาสาเหตุ",
+        "ตรวจสอบสายไฟและจุดต่อ",
+        "ทำความสะอาดอุปกรณ์",
+        "ถอดตรวจสอบอุปกรณ์ที่ผิดปกติ",
+        "เปลี่ยนอุปกรณ์ที่ชำรุด",
+        "ปรับตั้งค่าและ Calibrate อุปกรณ์",
+        "ติดตั้งอะไหล่สำรองเพื่อทดสอบ",
+        "ทดสอบการทำงานร่วมกับลูกค้า"
+    ],
+
+    result: [
+        "เครื่องกลับมาทำงานปกติ",
+        "ทดสอบแล้วสามารถใช้งานได้ปกติ",
+        "พบอุปกรณ์ชำรุด ต้องเปลี่ยนใหม่",
+        "อาการยังคงเกิดซ้ำ ต้องตรวจสอบเพิ่มเติม",
+        "ใช้งานได้ชั่วคราวหลังติดตั้งอะไหล่สำรอง",
+        "ไม่พบความผิดปกติระหว่างทดสอบ",
+        "รออะไหล่เพื่อดำเนินการต่อ"
+    ],
+
+    next: [
+        "ปิดเคสหลังลูกค้ายืนยันผล",
+        "ติดตามอาการหลังใช้งาน",
+        "เสนอราคาอะไหล่ทดแทน",
+        "รออะไหล่และนัดหมายเข้าดำเนินการ",
+        "ประสานงานกับทีม Technical Support",
+        "ลูกค้าดำเนินการเองและแจ้งผลกลับ",
+        "ยังไม่มีแผนดำเนินการเพิ่มเติม"
+    ]
+};
+
+/* เติมตัวเลือกข้อความสำเร็จรูป */
+function populatePresets(step) {
+    step.querySelectorAll("select.preset").forEach(select => {
+        const field = select.dataset.field;
+
+        presets[field].forEach(text => {
+            const option = document.createElement("option");
+            option.value = text;
+            option.textContent = text;
+            select.appendChild(option);
+        });
+    });
+}
+
+/* เลือกข้อความแล้วใส่ลงในช่องข้อความ */
+function applyPreset(select) {
+    if (!select.value) return;
+
+    const field = select.dataset.field;
+    const textarea = select.parentElement.querySelector(
+        'textarea[data-field="' + field + '"]'
+    );
+
+    textarea.value = select.value;
+    textarea.dispatchEvent(new Event("input"));
+    select.value = "";
+}
+
+/* เพิ่มขั้นตอน */
+function addStep(data = {}) {
+    const template = document.getElementById("stepTemplate");
+    const step = template.content.firstElementChild.cloneNode(true);
+
+    step.querySelectorAll("textarea").forEach(textarea => {
+        textarea.value = data[textarea.dataset.field] || "";
+
+        textarea.addEventListener("input", () => {
+            textarea.style.height = "auto";
+            textarea.style.height =
+                Math.max(65, textarea.scrollHeight) + "px";
+        });
+    });
+
+    populatePresets(step);
+
+    stepsContainer.appendChild(step);
+
+    if (data.photos) {
+        const list = step.querySelector(".photo-list");
+
+        data.photos.forEach(photo => {
+            createPhoto(list, photo);
+        });
+    }
+
+    updateStepNumbers();
+}
+
+/* ลบขั้นตอน */
+function removeStep(button) {
+    button.closest(".step").remove();
+    updateStepNumbers();
+}
+
+/* จัดหมายเลขขั้นตอนใหม่ */
+function updateStepNumbers() {
+    document.querySelectorAll(".step").forEach((step, index) => {
+        step.querySelector(".step-title").textContent =
+            "Step " + (index + 1);
+    });
+}
+
+/* ย่อและบีบอัดรูปก่อนเก็บ */
+function compressImage(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+
+        reader.onload = () => {
+            const image = new Image();
+
+            image.onload = () => {
+                const maxSize = 1000;
+                const scale = Math.min(
+                    1,
+                    maxSize / Math.max(image.width, image.height)
+                );
+
+                const canvas = document.createElement("canvas");
+                canvas.width = Math.round(image.width * scale);
+                canvas.height = Math.round(image.height * scale);
+
+                const context = canvas.getContext("2d");
+
+                context.drawImage(
+                    image,
+                    0,
+                    0,
+                    canvas.width,
+                    canvas.height
+                );
+
+                resolve(canvas.toDataURL("image/jpeg", 0.68));
+            };
+
+            image.onerror = reject;
+            image.src = reader.result;
+        };
+
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+    });
+}
+
+/* เพิ่มรูปภาพ */
+async function addPhotos(input) {
+    const list = input.parentElement.querySelector(".photo-list");
+
+    for (const file of input.files) {
+        try {
+            const compressed = await compressImage(file);
+            createPhoto(list, compressed);
+        } catch (error) {
+            alert("ไม่สามารถอ่านรูปภาพนี้ได้");
+        }
+    }
+
+    input.value = "";
+}
+
+/* แสดงรูปในรายงาน */
+function createPhoto(list, src) {
+    const wrapper = document.createElement("div");
+    wrapper.className = "photo-item";
+
+    const image = document.createElement("img");
+    image.className = "photo";
+    image.src = src;
+    image.alt = "Service photo";
+
+    const button = document.createElement("button");
+    button.className = "remove-photo danger no-print";
+    button.textContent = "ลบ";
+
+    button.onclick = () => wrapper.remove();
+
+    wrapper.appendChild(image);
+    wrapper.appendChild(button);
+
+    list.appendChild(wrapper);
+}
+
+/* อ่านข้อมูลทั้งหมด */
+function collectData(includePhotos = true) {
+    return {
+        customer: document.getElementById("customer").value,
+        machine: document.getElementById("machine").value,
+        date: document.getElementById("date").value,
+        caseNo: document.getElementById("caseNo").value,
+
+        steps: Array.from(
+            stepsContainer.querySelectorAll(".step")
+        ).map(step => {
+            const item = {};
+
+            ["target", "action", "result", "next"].forEach(field => {
+                item[field] = step.querySelector(
+                    'textarea[data-field="' + field + '"]'
+                ).value;
+            });
+
+            item.photos = includePhotos
+                ? Array.from(step.querySelectorAll("img.photo"))
+                    .map(image => image.src)
+                : [];
+
+            return item;
+        })
+    };
+}
+
+/* สร้างหรือเปิดฐานข้อมูล IndexedDB */
+function openDatabase() {
+    return new Promise((resolve, reject) => {
+        const request = indexedDB.open("ServiceReportDB", 1);
+
+        request.onupgradeneeded = () => {
+            const database = request.result;
+
+            if (!database.objectStoreNames.contains("drafts")) {
+                database.createObjectStore("drafts");
+            }
+        };
+
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+    });
+}
+
+/* บันทึกฉบับร่าง */
+async function saveDraft() {
+    try {
+        const database = await openDatabase();
+        const report = collectData(true);
+
+        await new Promise((resolve, reject) => {
+            const transaction = database.transaction(
+                "drafts",
+                "readwrite"
+            );
+
+            transaction.objectStore("drafts").put(report, "latest");
+
+            transaction.oncomplete = resolve;
+            transaction.onerror = () => reject(transaction.error);
+            transaction.onabort = () => reject(transaction.error);
+        });
+
+        database.close();
+
+        alert("บันทึกฉบับร่างพร้อมรูปภาพเรียบร้อยแล้ว");
+
+    } catch (error) {
+        /* สำรองเป็นข้อความอย่างเดียว หากเก็บรูปไม่สำเร็จ */
+        try {
+            const report = collectData(false);
+
+            localStorage.setItem(
+                "ServiceReportTextDraft",
+                JSON.stringify(report)
+            );
+
+            alert(
+                "บันทึกข้อความแล้ว แต่ไม่สามารถเก็บรูปภาพได้ " +
+                "โปรดลดจำนวนรูปหรือเปิดเว็บในเบราว์เซอร์หลัก"
+            );
+
+        } catch (fallbackError) {
+            alert(
+                "บันทึกไม่สำเร็จ กรุณาตรวจสอบพื้นที่จัดเก็บของเบราว์เซอร์"
+            );
+        }
+    }
+}
+
+/* โหลดฉบับร่าง */
+async function loadDraft() {
+    try {
+        let report = null;
+
+        try {
+            const database = await openDatabase();
+
+            report = await new Promise((resolve, reject) => {
+                const transaction = database.transaction(
+                    "drafts",
+                    "readonly"
+                );
+
+                const request = transaction
+                    .objectStore("drafts")
+                    .get("latest");
+
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject(request.error);
+            });
+
+            database.close();
+
+        } catch (error) {
+            console.warn("IndexedDB unavailable", error);
+        }
+
+        if (!report) {
+            const saved = localStorage.getItem(
+                "ServiceReportTextDraft"
+            );
+
+            if (saved) report = JSON.parse(saved);
+        }
+
+        if (!report) {
+            alert("ไม่พบฉบับร่างที่บันทึกไว้");
+            return;
+        }
+
+        document.getElementById("customer").value =
+            report.customer || "";
+
+        document.getElementById("machine").value =
+            report.machine || "";
+
+        document.getElementById("date").value =
+            report.date || "";
+
+        document.getElementById("caseNo").value =
+            report.caseNo || "";
+
+        stepsContainer.innerHTML = "";
+
+        (report.steps || []).forEach(step => addStep(step));
+
+        alert("โหลดฉบับร่างเรียบร้อยแล้ว");
+
+    } catch (error) {
+        alert("โหลดฉบับร่างไม่สำเร็จ กรุณาลองใหม่อีกครั้ง");
+    }
+}
+
+/* พิมพ์หรือบันทึก PDF */
+function printReport() {
+    try {
+        window.focus();
+        window.print();
+    } catch (error) {
+        alert(
+            "ไม่สามารถเปิดหน้าพิมพ์ได้ " +
+            "กรุณาเปิดเว็บไซต์ด้วย Chrome หรือ Safari โดยตรง"
+        );
+    }
+}
+
+/* ตั้งวันที่ปัจจุบัน */
+(function initialize() {
+    const dateField = document.getElementById("date");
+
+    const now = new Date();
+    const localDate = new Date(
+        now.getTime() - now.getTimezoneOffset() * 60000
+    ).toISOString().slice(0, 10);
+
+    dateField.value = localDate;
+
+    addStep();
+})();
+</script>
+
+</body>
+</html>
