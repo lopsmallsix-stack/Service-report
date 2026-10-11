@@ -1,28 +1,276 @@
-<!doctype html>
-<html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Service Report</title>
-<style>
-*{box-sizing:border-box}body{margin:0;background:#f2f5f8;color:#203040;font-family:Arial,"Noto Sans Thai",Tahoma,sans-serif}.wrap{max-width:1200px;margin:auto;padding:16px}.panel{background:#fff;border:1px solid #dbe2e8;border-radius:10px;padding:14px;margin-bottom:12px}h1{margin:0;color:#193650;font-size:24px}.sub,.hint{color:#607080;font-size:12px}.fields{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:14px}label{display:block;font-size:12px;font-weight:bold;margin-bottom:4px;color:#4b5c6d}input,textarea{font:inherit;width:100%;padding:8px;border:1px solid #cbd5df;border-radius:6px}textarea{min-height:72px;resize:vertical}button{border:0;border-radius:7px;padding:9px 12px;font:inherit;font-weight:bold;cursor:pointer}.primary{background:#193650;color:white}.secondary{background:#e9eef3;color:#203040}.danger,.removephoto{background:#fff0f0;color:#a32323}.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.step{border:1px solid #bfcbd6;margin:10px 0;background:#fff;break-inside:avoid}.stephead{background:#eaf1f7;padding:8px 10px;display:flex;justify-content:space-between;align-items:center;color:#193650;font-weight:bold}.stepbody{padding:10px}.stepfields{display:grid;grid-template-columns:1fr 1.35fr 130px 1fr 1fr;gap:8px;align-items:start}.thumb{width:54px;height:42px;object-fit:cover;border:1px solid #cbd5df;border-radius:4px}.photos{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px}.photoitem{display:flex;flex-direction:column;align-items:center}.removephoto{font-size:10px;padding:2px 4px;margin-top:2px}.small{font-size:10px;color:#607080}.reporthead{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}h2{font-size:16px;margin:0 0 8px;color:#193650}
-@media(max-width:800px){.fields{grid-template-columns:repeat(2,minmax(0,1fr))}.stepfields{grid-template-columns:repeat(2,minmax(0,1fr))}.photobox{grid-column:span 2}.thumb{width:70px;height:52px}}
-@page{size:A4 landscape;margin:8mm}
-@media print{body{background:white;font-size:9pt}.wrap{max-width:none;padding:0}.panel{border:0;border-radius:0;padding:0;margin-bottom:4mm}.no-print,.actions,.stephead button,.removephoto{display:none!important}h1{font-size:17pt}.fields{gap:3mm;margin-top:3mm}label{font-size:7pt;margin-bottom:1mm}input,textarea{border:0;padding:1mm 0;border-radius:0;font-size:8pt;background:transparent;color:#111}textarea{min-height:0;overflow:visible;resize:none}.step{margin:0;border:1px solid #9eabb7;border-radius:0}.stephead{padding:2mm 3mm;background:#eaf1f7!important;print-color-adjust:exact;-webkit-print-color-adjust:exact}.stepbody{padding:2mm}.stepfields{grid-template-columns:1fr 1.35fr 25mm 1fr 1fr;gap:2mm}.thumb{width:14mm;height:11mm;border-radius:1mm}.photos{gap:1mm;margin-top:1mm}.small{display:none}.hint{font-size:7pt}}
-</style></head><body><div class="wrap">
-<section class="panel"><div class="reporthead"><div><h1>SERVICE REPORT</h1><div class="sub">Service / Maintenance Record</div></div><div class="sub">Report generated from Service Report Web App</div></div>
-<div class="fields"><div><label>Customer Name</label><input id="customer" placeholder="ชื่อลูกค้า"></div><div><label>Machine Name</label><input id="machine" placeholder="ชื่อเครื่อง"></div><div><label>Date</label><input id="date" type="date"></div><div><label>Case No.</label><input id="caseNo" placeholder="หมายเลขเคส"></div></div>
-<div class="actions no-print"><button class="primary" onclick="addStep()">+ เพิ่มขั้นตอน</button><button class="secondary" onclick="saveDraft()">บันทึกฉบับร่าง</button><button class="secondary" onclick="loadDraft()">โหลดฉบับร่าง</button><button class="primary" onclick="window.print()">พิมพ์ / บันทึก PDF แนวนอน</button></div><p class="hint no-print">ในหน้าต่างพิมพ์ เลือก Save as PDF, กระดาษ A4 และ Layout: Landscape เพื่อให้ภาษาไทยใช้ฟอนต์ของเครื่อง</p></section>
-<section class="panel"><h2>Repair Details</h2><p class="hint no-print">แต่ละขั้นตอนเรียงในแถวเดียว: Target → Action → รูปประกอบ → Result → Next Action</p><div id="steps"></div></section></div>
-<template id="tpl"><div class="step"><div class="stephead"><span class="step-title">Step 1</span><button class="danger no-print" onclick="this.closest('.step').remove();renumber()">ลบขั้นตอน</button></div><div class="stepbody"><div class="stepfields">
-<div><label>Target</label><textarea data-f="target" placeholder="เป้าหมาย / อาการ"></textarea></div><div><label>Action</label><textarea data-f="action" placeholder="รายละเอียดการดำเนินงาน"></textarea></div>
-<div class="photobox"><label>รูปประกอบ</label><input class="no-print" type="file" accept="image/*" multiple onchange="photos(this)"><div class="photos"></div><div class="small no-print">รูปย่อขนาดในรายงาน</div></div>
-<div><label>Result</label><textarea data-f="result" placeholder="ผลการดำเนินงาน"></textarea></div><div><label>Next Action</label><textarea data-f="next" placeholder="ขั้นตอนถัดไป"></textarea></div>
-</div></div></div></template>
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Service Report Web App</title>
+    <style>
+        /* --- CSS จัดหน้ารายงานสำหรับพิมพ์ A4 แนวนอน --- */
+        body {
+            font-family: 'Sarabun', sans-serif, Arial;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f6f9;
+        }
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        h1, h2 {
+            text-align: center;
+            color: #333;
+        }
+        .action-bar {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 20px;
+            background: #eef2f7;
+            padding: 15px;
+            border-radius: 6px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            border-radius: 4px;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+        .btn-success { background-color: #28a745; color: white; }
+        .btn-primary { background-color: #007bff; color: white; }
+        .btn-info { background-color: #17a2b8; color: white; }
+        .btn-danger { background-color: #dc3545; color: white; }
+        button:hover { opacity: 0.9; }
+        
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        .form-group label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #555;
+        }
+        .form-group input {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 15px;
+        }
+
+        /* โครงสร้างตารางแนวราบตามโจทย์ (Target -> Action -> รูป -> Result -> Next Action) */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #aaa;
+            padding: 8px;
+            text-align: left;
+            vertical-align: top;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .step-row input, .step-row textarea {
+            width: 95%;
+            padding: 6px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            resize: vertical;
+            font-family: inherit;
+        }
+        .preview-img {
+            max-width: 120px;
+            max-height: 120px;
+            display: block;
+            margin-top: 5px;
+            border: 1px dashed #ccc;
+            object-fit: contain;
+        }
+
+        /* --- CSS พิเศษสำหรับการพิมพ์ (Print Media) --- */
+        @media print {
+            body {
+                background-color: #fff;
+                padding: 0;
+            }
+            .action-bar, .btn-danger, .btn-info, input[type="file"], .step-row td:last-child, th:last-child {
+                display: none !important; /* ซ่อนปุ่มควบคุมและปุ่มลบตอนพิมพ์ */
+            }
+            .container {
+                box-shadow: none;
+                padding: 0;
+                max-width: 100%;
+            }
+            input, textarea {
+                border: none !important;
+                background: transparent !important;
+                outline: none !important;
+                resize: none !important;
+            }
+            /* บังคับหน้ากระดาษ A4 แนวนอน */
+            @page {
+                size: A4 landscape;
+                margin: 15mm;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>SERVICE REPORT</h1>
+    <h2>Service / Maintenance Record</h2>
+
+    <!-- บาร์ปุ่มควบคุมการทำงาน -->
+    <div class="action-bar">
+        <button type="button" class="btn-success" onclick="saveDraft()">💾 บันทึกฉบับร่าง</button>
+        <button type="button" class="btn-info" onclick="loadDraft()">📂 โหลดฉบับร่าง</button>
+        <button type="button" class="btn-primary" onclick="triggerPrint()">🖨️ พิมพ์ / บันทึก PDF แนวนอน</button>
+    </div>
+
+    <!-- ส่วนข้อมูลลูกค้าและเครื่องจักร -->
+    <div class="meta-grid">
+        <div class="form-group">
+            <label>Customer Name</label>
+            <input type="text" id="custName">
+        </div>
+        <div class="form-group">
+            <label>Machine Name</label>
+            <input type="text" id="machineName">
+        </div>
+        <div class="form-group">
+            <label>Date</label>
+            <input type="date" id="reportDate">
+        </div>
+        <div class="form-group">
+            <label>Case No.</label>
+            <input type="text" id="caseNo">
+        </div>
+    </div>
+
+    <h2>Repair Details</h2>
+    <button type="button" class="btn-primary" onclick="addStepRow()">➕ เพิ่มขั้นตอน</button>
+    
+    <!-- ตารางบันทึกขั้นตอนงาน -->
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 5%;">Step</th>
+                <th style="width: 20%;">Target</th>
+                <th style="width: 25%;">Action</th>
+                <th style="width: 15%;">รูปประกอบ</th>
+                <th style="width: 20%;">Result</th>
+                <th style="width: 10%;">Next Action</th>
+                <th style="width: 5%;">จัดการ</th>
+            </tr>
+        </thead>
+        <tbody id="stepTableBody">
+            <!-- แถวขั้นตอนจะถูกเพิ่มที่นี่ผ่าน JavaScript -->
+        </tbody>
+    </table>
+</div>
+
+<!-- ========================================== -->
+<!-- ข้อที่ 3: คลังช้อยส์คำตอบที่ใช้บ่อย (Data List Suggestions) -->
+<!-- ========================================== -->
+<datalist id="target-suggestions">
+    <option value="เครื่องจักรหลัก (Main Machine)">
+    <option value="ระบบควบคุม/ไฟฟ้า (Electrical System)">
+    <option value="ปั๊มไฮดรอลิก/ระบบลม (Pump & Pneumatic)">
+    <option value="โครงสร้างภายนอก (Structure & Body)">
+    <option value="เซนเซอร์/ระบบวัดระยะ (Sensor & Calibration)">
+</datalist>
+
+<datalist id="action-suggestions">
+    <option value="ตรวจเช็กสภาพภายนอกและทำความสะอาดสิ่งสกปรก">
+    <option value="ดำเนินการเปลี่ยนอะไหล่และชิ้นส่วนที่เสื่อมสภาพ">
+    <option value="ปรับแต่งตั้งค่าการทำงาน (Calibration) ให้ตรงตามเกณฑ์">
+    <option value="ขันแน่นจุดยึดและทาจารบีหล่อลื่นระบบส่งกำลัง">
+    <option value="แก้ไขวงจรไฟฟ้าที่หลวมและทดสอบการจ่ายกระแสไฟ">
+</datalist>
+
+<datalist id="result-suggestions">
+    <option value="เครื่องจักรกลับมาทำงานได้ตามปกติ 100%">
+    <option value="ผ่านการทดสอบเบื้องต้น ควรเฝ้าระวังอาการเพิ่มเติม">
+    <option value="ยังไม่สมบูรณ์เนื่องจากต้องรออะไหล่ทดแทนเพิ่มเติม">
+    <option value="แก้ไขชั่วคราวเพื่อให้ระบบเดินเครื่องต่อได้ก่อน">
+</datalist>
+
+<!-- ========================================== -->
+<!-- ระบบจัดการหลังบ้าน (JavaScript) -->
+<!-- ========================================== -->
 <script>
-const host=document.getElementById('steps');
-function addStep(d={}){let n=document.getElementById('tpl').content.firstElementChild.cloneNode(true);n.querySelectorAll('textarea').forEach(t=>{t.value=d[t.dataset.f]||'';t.addEventListener('input',()=>{t.style.height='auto';t.style.height=Math.max(72,t.scrollHeight)+'px'})});host.appendChild(n);if(d.photos)d.photos.forEach(p=>addPhoto(n.querySelector('.photos'),p));renumber()}
-function renumber(){[...host.querySelectorAll('.step')].forEach((s,i)=>s.querySelector('.step-title').textContent='Step '+(i+1))}
-function photos(inp){let box=inp.parentElement.querySelector('.photos');[...inp.files].forEach(f=>{let r=new FileReader();r.onload=()=>addPhoto(box,r.result);r.readAsDataURL(f)});inp.value=''}
-function addPhoto(box,src){let w=document.createElement('div');w.className='photoitem';let im=document.createElement('img');im.className='thumb';im.src=src;im.alt='Repair photo';let b=document.createElement('button');b.className='removephoto no-print';b.textContent='ลบ';b.onclick=()=>w.remove();w.append(im,b);box.appendChild(w)}
-function data(){return {customer:customer.value,machine:machine.value,date:date.value,caseNo:caseNo.value,steps:[...host.querySelectorAll('.step')].map(s=>({target:s.querySelector('[data-f=target]').value,action:s.querySelector('[data-f=action]').value,result:s.querySelector('[data-f=result]').value,next:s.querySelector('[data-f=next]').value,photos:[...s.querySelectorAll('img.thumb')].map(i=>i.src)}))}}
-function saveDraft(){try{localStorage.setItem('serviceReportLandscapeDraft',JSON.stringify(data()));alert('บันทึกฉบับร่างแล้ว')}catch(e){alert('บันทึกไม่สำเร็จ อาจมีรูปภาพมากเกินไป')}}
-function loadDraft(){let v=localStorage.getItem('serviceReportLandscapeDraft');if(!v){alert('ไม่พบฉบับร่าง');return}try{let d=JSON.parse(v);customer.value=d.customer||'';machine.value=d.machine||'';date.value=d.date||'';caseNo.value=d.caseNo||'';host.innerHTML='';(d.steps||[]).forEach(addStep)}catch(e){alert('โหลดฉบับร่างไม่สำเร็จ')}}
-date.value=new Date().toISOString().slice(0,10);addStep();
-</script></body></html>
+    let stepCount = 0;
+
+    // 1. ฟังก์ชันเพิ่มแถวขั้นตอนใหม่
+    function addStepRow(savedData = null) {
+        stepCount++;
+        const tbody = document.getElementById('stepTableBody');
+        const row = document.createElement('tr');
+        row.className = 'step-row';
+        row.id = `step_row_${stepCount}`;
+
+        // โครงสร้างคอลัมน์ดึงจากคำตอบที่ใช้บ่อยด้วยดรอปดาวน์อัตโนมัติ (list="...")
+        row.innerHTML = `
+            <td style="text-align:center; font-weight:bold;">${stepCount}</td>
+            <td><input type="text" class="t-input" list="target-suggestions" value="${savedData ? savedData.target : ''}" placeholder="ระบุเป้าหมาย..."></td>
+            <td><textarea class="a-input" list="action-suggestions" rows="3" placeholder="ระบุการแก้ไข...">${savedData ? savedData.action : ''}</textarea></td>
+            <td>
+                <input type="file" accept="image/*" onchange="handleImage(this, ${stepCount})">
+                <img id="prev_${stepCount}" class="preview-img" src="${savedData ? savedData.img : ''}" style="${savedData && savedData.img ? 'display:block;' : 'display:none;'}">
+            </td>
+            <td><textarea class="r-input" rows="3" placeholder="ระบุผลลัพธ์...">${savedData ? savedData.result : ''}</textarea></td>
+            <td><input type="text" class="n-input" value="${savedData ? savedData.next : ''}" placeholder="แผนต่อไป..."></td>
+            <td><button type="button" class="btn-danger" onclick="removeStepRow(${stepCount})">ลบ</button></td>
+        `;
+        
+        tbody.appendChild(row);
+        // ผูกความสามารถคำตอบใช้บ่อยให้ Textarea (Action/Result)
+        bindDatalistToTextarea();
+    }
+
+    // ฟังก์ชันลบแถว
+    function removeStepRow(id) {
+        const row = document.getElementById(`step_row_${id}`);
+        if(row) row.remove();
+        reCalculateStepNumbers();
+    }
+
+    // จัดเลขลำดับขั้นตอนใหม่หลังจากมีการลบ
+    function reCalculateStepNumbers() {
+        const rows = document.querySelectorAll('#stepTableBody tr');
+        stepCount = 0;
+        rows.forEach((row) => {
+            stepCount++;
+            row.cells[0].innerText = stepCount;
+        });
+    }
+
+    // ==========================================
+    // ข้อที่ 1 & 2: ระบบบีบอัดรูปภาพอัจฉริยะ (กัน LocalStorage เต็ม)
+    // ==========================================
+    function compressImage(file, maxWidth = 600, quality = 0.6) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = function (event) {
+                const img = new Image();
+                img.src = event.target.result;
+                img.onload = function () {
+                    const canvas = document.createElement('canvas');
+                    let width = img.width;
